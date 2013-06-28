@@ -1,0 +1,4 @@
+sharif_calendar:
+    resource: "@SharifCalendarBundle/Resources/config/routing.yml"
+    prefix:   /
+

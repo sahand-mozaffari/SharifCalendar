@@ -1,0 +1,2 @@
+imports:
+    - { resource: ../../src/Sharif/CalendarBundle/Resources/config/security.yml }
