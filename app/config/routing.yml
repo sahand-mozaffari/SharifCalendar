@@ -2,3 +2,5 @@ sharif_calendar:
     resource: "@SharifCalendarBundle/Resources/config/routing.yml"
     prefix:   /
 
+fp_openid_security:
+    resource: "@FpOpenIdBundle/Resources/config/routing/security.xml"

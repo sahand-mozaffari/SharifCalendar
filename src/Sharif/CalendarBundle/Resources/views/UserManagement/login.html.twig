@@ -1,0 +1,72 @@
+{% extends "SharifCalendarBundle::baseHtml.html.twig" %}
+
+{% block body %}
+	{# logout option #}
+	<div>
+		{% if is_granted("ROLE_USER") %}
+			{{ 'already_logged_in'|trans|humanize }}:
+			<a href="{{ path('fp_openid_security_logout') }}">
+				{{ 'logout'|trans|humanize }}
+			</a>
+		{% endif %}
+	</div>
+
+	{# errors #}
+	<div>
+		{% if error %}
+			<div>{{ error }}</div>
+		{% endif %}
+	</div>
+
+	{# messages #}
+	<div>
+		{% for key, message in app.session.getFlashes() %}
+			<div class="{{ key }}">
+				{{ message }}
+			</div>
+		{% endfor %}
+	</div>
+
+	{# forms #}
+	<div>
+		<form action="{{ path('sharif_calendar_login_check') }}" method="post">
+			<label for="username"> User name </label>
+			<input type="text" id="username" name="_user"" />
+			<br />
+			<label for="password"> Password </label>
+			<input type="password" id="password" name="_password" />
+			<br />
+			<label for="remember_me"> Keep me logged in </label>
+			<input type="checkbox" name="_remember_me" id="remember_me" />
+			<br />
+			<input type="submit" value="Login" />
+		</form>
+
+		<hr />
+
+		<form id="fp_openid_login"
+				action="{{ path("fp_openid_security_check") }}"
+				method="post">
+			<label for="openid_identifier">Identifier: </label>
+			<input type="text" id="openid_identifier"
+					name="openid_identifier"
+					value="" />
+			<br />
+			<label for="remember_me">Keep me logged in</label>
+			<input type="checkbox"
+					id="remember_me"
+					name="_remember_me"
+					checked="checked" />
+			<br />
+			<input type="submit" id="_submit" name="_submit" value="Login" />
+			<input type="hidden"
+					id="target_path"
+					name="_target_path"
+					value="" />
+		</form>
+	</div>
+
+	<a href="{{ path('sharif_calendar_signup') }}">
+		{{ 'signup'|trans|humanize }}
+	</a>
+{% endblock body %}

@@ -1,7 +1,9 @@
-parameters:
-#    sharif_calendar.example.class: Sharif\CalendarBundle\Example
-
 services:
-#    sharif_calendar.example:
-#        class: %sharif_calendar.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+    sharif.calendar.openid_user_manager:
+        class: Sharif\CalendarBundle\Security\OpenIdUserManager
+        arguments: [@fp_openid.identity_manager, @doctrine.orm.entity_manager]
+
+    user_provider:
+        class: 'Sharif\CalendarBundle\Security\UserRepository'
+        arguments:
+            entityManager: '@doctrine.orm.entity_manager'

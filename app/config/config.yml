@@ -1,6 +1,7 @@
 imports:
     - { resource: parameters.yml }
     - { resource: security.yml }
+    - { resource: "@SharifCalendarBundle/Resources/config/services.yml" }
 
 framework:
     #esi:             ~
@@ -29,7 +30,7 @@ twig:
 assetic:
     debug:          %kernel.debug%
     use_controller: false
-    bundles:        [ ]
+    bundles:        [ SharifCalendarBundle ]
     #java: /usr/bin/java
     filters:
         cssrewrite: ~
@@ -63,3 +64,8 @@ swiftmailer:
     username:  %mailer_user%
     password:  %mailer_password%
     spool:     { type: memory }
+
+# FpOpenIdBundle Configuration
+fp_open_id:
+    db_driver: orm
+    identity_class: \Sharif\CalendarBundle\Entity\OpenIdIdentity

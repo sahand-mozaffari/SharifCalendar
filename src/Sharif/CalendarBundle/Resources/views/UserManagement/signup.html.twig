@@ -1,0 +1,34 @@
+{% extends "SharifCalendarBundle::baseHtml.html.twig" %}
+
+{% block body %}
+	<div>
+		{% for key, message in app.session.getFlashes() %}
+			<div class="{{ key }}">
+				{{ message }}
+			</div>
+		{% endfor %}
+	</div>
+
+	<form method="post" {{ form_enctype(formOpenId) }}>
+		{{ form_rest(formOpenId) }}
+		<input type='hidden' name='form' value='openId' />
+		<input type='submit' value="{{ 'register'|trans }}" />
+	</form>
+	<hr />
+	<form method="post" {{ form_enctype(formUserPass) }}>
+		{{ form_rest(formUserPass) }}
+		<input type='hidden' name='form' value='userPass' />
+		<input type='submit' value="{{ 'register'|trans }}" />
+	</form>
+{% endblock body %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{% javascripts
+			'@SharifCalendarBundle/Resources/public/js/jquery-2.0.1.min.js'%}
+		<script src="{{ asset_url }}" type="text/javascript"></script>
+	{% endjavascripts %}
+	{% javascripts '@SharifCalendarBundle/Resources/public/js/signup/main.js'%}
+		<script src="{{ asset_url }}" type="text/javascript"></script>
+	{% endjavascripts %}
+{% endblock javascripts %}

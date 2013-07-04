@@ -1,3 +1,22 @@
 sharif_calendar_homepage:
     pattern:  /hello/{name}
-    defaults: { _controller: SharifCalendarBundle:Default:index }
+    defaults:
+        _controller: SharifCalendarBundle:Default:index
+
+sharif_calendar_login:
+    pattern:  /login
+    defaults:
+        _controller: SharifCalendarBundle:UserManagement:login
+
+sharif_calendar_login_check:
+    pattern: /secured_area/login_check
+
+sharif_calendar_signup:
+    pattern: /signup
+    defaults:
+        _controller: SharifCalendarBundle:UserManagement:signup
+
+sharif_calendar_signup_successful:
+    pattern: /signup_successful
+    defaults:
+        _controller: SharifCalendarBundle:UserManagement:signupSuccessful
