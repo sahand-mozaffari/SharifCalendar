@@ -11,10 +11,10 @@ use Symfony\Component\Security\Core\Util\SecureRandom;
  */
 class User implements UserInterface, \Serializable {
 	/**
-	 * @var string This User's first name.
-	 * @ORM\Column(type="string",length=50, nullable=false)
+	 * @var string Email address;
+	 * @ORM\Column(type="string", length=254, nullable=true)
 	 */
-	protected $firstName;
+	protected $email;
 	/**
 	 * @var integer Unique key
 	 * @ORM\Column(type="integer", nullable=false, unique=true)
@@ -24,9 +24,9 @@ class User implements UserInterface, \Serializable {
 	protected $id;
 	/**
 	 * @var string This User's last name.
-	 * @ORM\Column(type="string", length=50, nullable=false)
+	 * @ORM\Column(type="string", length=100, nullable=false)
 	 */
-	protected $lastName;
+	protected $name;
 	/**
 	 * @var OpenIdIdentity This User's open IDs.
 	 * @ORM\OneToMany(targetEntity="OpenIdIdentity", mappedBy="user",
@@ -44,7 +44,7 @@ class User implements UserInterface, \Serializable {
 	 */
 	protected $salt;
 	/**
-	 * @var string This User's id.
+	 * @var string This User's unique name.
 	 * @ORM\Column(type="string", length=254, nullable=true, unique=true)
 	 */
 	protected $username;
@@ -52,21 +52,12 @@ class User implements UserInterface, \Serializable {
 	/**
 	 * Constructor
 	 */
-	public function __construct($firstName, $lastName, $username=null,
-	        $password=null, $openId=null) {
+	public function __construct($name, $email, $username=null, $password=null) {
 		$this->openIds = new ArrayCollection();
-		$this->setFirstName($firstName);
-		$this->setLastName($lastName);
-
-		if (null != $username && null != $password) {
-			$this->setUserName($username);
-			$this->setPasswordUnhashed($password);
-		} else if ($openId != null) {
-			$this->addOpenId(new OpenIdIdentity($openId, $this));
-		} else {
-			throw new RuntimeException(
-			        'You have to provide either user name and password, or an open ID.');
-		}
+		$this->setName($name);
+		$this->setEmail($email);
+		$this->setUserName($username);
+		$this->setPasswordUnhashed($password);
 	}
 
 	/**
@@ -87,11 +78,11 @@ class User implements UserInterface, \Serializable {
 	}
 
 	/**
-	 * Getter method for this user's first name.
-	 * @return string This user's first name.
+	 * Getter method for email field.
+	 * @return string Email address.
 	 */
-	public function getFirstName() {
-		return $this->firstName;
+	public function getEmail() {
+		return $this->email;
 	}
 
 	/**
@@ -106,8 +97,8 @@ class User implements UserInterface, \Serializable {
 	 * Getter method for this user's last name.
 	 * @return string This user's last name.
 	 */
-	public function getLastName() {
-		return $this->lastName;
+	public function getName() {
+		return $this->name;
 	}
 
 	/**
@@ -170,18 +161,17 @@ class User implements UserInterface, \Serializable {
 
 	public function serialize() {
 		return serialize(
-		        array($this->firstName, $this->id, $this->lastName,
-		                $this->openIds, $this->password, $this->salt,
-		                $this->username));
+		        array($this->id, $this->name, $this->openIds, $this->password,
+		        $this->salt, $this->username));
 	}
 
 	/**
-	 * Setter method for this user's first name.
-	 * @param string This user's first name.
+	 * Setter method for email field.
+	 * @param $email string New value for email field.
 	 * @return User This.
 	 */
-	public function setFirstName($firstName) {
-		$this->firstName = $firstName;
+	public function setEmail($email) {
+		$this->email = $email;
 		return $this;
 	}
 
@@ -200,8 +190,8 @@ class User implements UserInterface, \Serializable {
 	 * @param string This user's last name.
 	 * @return User This.
 	 */
-	public function setLastName($lastName) {
-		$this->lastName = $lastName;
+	public function setName($name) {
+		$this->name = $name;
 		return $this;
 	}
 
@@ -222,7 +212,7 @@ class User implements UserInterface, \Serializable {
 	 * @param string $unhashed Unhashed password to be set to this user.
 	 * @return User This.
 	 */
-	private function setPasswordUnhashed($unhashed) {
+	public function setPasswordUnhashed($unhashed) {
 		$generator = new SecureRandom();
 		$this->setSalt(base64_encode($generator->nextBytes(15)));
 
@@ -259,12 +249,11 @@ class User implements UserInterface, \Serializable {
 
 	public function unserialize($serialized) {
 		$arr = unserialize($serialized);
-		$this->firstName = $arr[0];
-		$this->id = $arr[1];
-		$this->lastName = $arr[2];
-		$this->openIds = $arr[3];
-		$this->password = $arr[4];
-		$this->salt = $arr[5];
-		$this->username = $arr[6];
+		$this->id = $arr[0];
+		$this->name = $arr[1];
+		$this->openIds = $arr[2];
+		$this->password = $arr[3];
+		$this->salt = $arr[4];
+		$this->username = $arr[5];
 	}
 }

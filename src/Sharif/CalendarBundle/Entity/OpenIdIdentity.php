@@ -49,7 +49,7 @@ class OpenIdIdentity extends BaseUserIdentity implements \Serializable {
 	}
 
 	public function serialize() {
-		return serialize(array($this->attributes, $this->id, $user->identity,
+		return serialize(array($this->attributes, $this->id, $this->identity,
 				$this->user));
 	}
 

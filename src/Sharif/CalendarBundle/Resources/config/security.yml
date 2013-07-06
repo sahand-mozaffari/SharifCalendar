@@ -21,12 +21,13 @@ security:
         main:
             pattern:    ^/
             fp_openid:
-                create_user_if_not_exists: false
+                create_user_if_not_exists: true
                 login_path: sharif_calendar_login
                 provider:   openid_user_manager
                 remember_me:  true
                 required_attributes:
                     - contact/email
+                    - namePerson
             form_login:
                 check_path: sharif_calendar_login_check
                 login_path: sharif_calendar_login
@@ -46,3 +47,4 @@ security:
         - { path: sharif_calendar_login, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: sharif_calendar_signup, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/secured_area, role: ROLE_USER }
+        - { path: ^/user, role: ROLE_USER }

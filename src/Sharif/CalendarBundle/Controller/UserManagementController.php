@@ -27,35 +27,11 @@ class UserManagementController extends Controller {
 			$error = $error->getMessage();
 		}
 
+		$this->get('session')->set('create_open_id_action', 'throw_exception');
 		return $this
 		        ->render(
 		                'SharifCalendarBundle:UserManagement:login.html.twig',
 		                array('error' => $error));
-	}
-
-	private function registerOpenId($data) {
-		$em = $this->getDoctrine()->getManager();
-
-		// Check for redundancy
-		$repository = $this->getDoctrine()->
-		        getRepository('SharifCalendarBundle:OpenIdIdentity');
-		if(null != $repository->findOneByIdentity($data->getOpenId())) {
-			$this->getRequest()->getSession()->getFlashBag()->
-			        add('error', 'openid_already_exists');
-			return $this->redirect(
-			        $this->generateUrl('sharif_calendar_signup'));
-		}
-
-		// New user and open ID
-		$user = new User($data->getFirstName(), $data->getLastName(), null,
-		        null, $data->getOpenId());
-
-		// Persisting to DB
-		$em->persist($user);
-		$em->persist($user->getOpenIds()[0]);
-		$em->flush();
-		return $this->redirect($this->generateUrl(
-				'sharif_calendar_signup_successful'));
 	}
 
 	private function registerUserPass($data) {
@@ -72,8 +48,8 @@ class UserManagementController extends Controller {
 		}
 
 		// New user
-		$user = new User($data->getFirstName(), $data->getLastName(),
-		        $data->getUserName(), $data->getPassword(), null);
+		$user = new User($data->getFullName(), $data->getEmail(),
+		        $data->getUserName(), $data->getPassword());
 
 		$em->persist($user);
 		$em->flush();
@@ -89,23 +65,15 @@ class UserManagementController extends Controller {
 
 		// Fill the form with previously entered data.
 		if($request->isMethod('POST')) {
-			if($request->get('form') == 'openId') {
-				// Bind data
-				$formOpenId->bind($request);
-				// Check if the data is valid.
-				if($formOpenId->isValid()) {
-					return $this->registerOpenId($formOpenId->getData());
-				}
-			} else if($request->get('form') == 'userPass') {
-				// Bind data
-				$formUserPass->bind($request);
-				// Check if the data is valid.
-				if($formUserPass->isValid()) {
-					return $this->registerUserPass($formUserPass->getData());
-				}
+			// Bind data
+			$formUserPass->bind($request);
+			// Check if the data is valid.
+			if($formUserPass->isValid()) {
+				return $this->registerUserPass($formUserPass->getData());
 			}
 		}
 
+		$this->get('session')->set('create_open_id_action', 'create_new');
 		// Output form.
 		return $this->render(
                 'SharifCalendarBundle:UserManagement:signup.html.twig',

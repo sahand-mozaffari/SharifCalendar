@@ -9,10 +9,18 @@
 		{% endfor %}
 	</div>
 
-	<form method="post" {{ form_enctype(formOpenId) }}>
-		{{ form_rest(formOpenId) }}
-		<input type='hidden' name='form' value='openId' />
-		<input type='submit' value="{{ 'register'|trans }}" />
+	<form id="fp_openid_login" method="post"
+			action="{{ path("fp_openid_security_check") }}" >
+		<label for="openid_identifier">Identifier: </label>
+		<input type="text" id="openid_identifier"
+				name="openid_identifier"
+				value="" />
+		<br />
+		<input type="submit" id="_submit" name="_submit" value="submit" />
+		<input type="hidden"
+				id="target_path"
+				name="_target_path"
+				value="" />
 	</form>
 	<hr />
 	<form method="post" {{ form_enctype(formUserPass) }}>

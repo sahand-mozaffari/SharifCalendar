@@ -7,17 +7,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class SignupDataUserPass extends AbstractType {
 	/**
-	 * @var string First name
-	 * @Assert\NotBlank(message="enter_first_name")
-	 * @Assert\MaxLength(limit=50, message="first_name_too_long")
+	 * @var string Email address.
+	 * @Assert\NotBlank(message="email_empty")
+	 * @Assert\Email(message="email_invalid")
 	 */
-	protected $firstName;
+	protected $email;
 	/**
 	 * @var string First name
 	 * @Assert\NotBlank(message="enter_last_name")
 	 * @Assert\MaxLength(limit=50, message="last_name_too_long")
 	 */
-	protected $lastName;
+	protected $fullName;
 	/**
 	 * @var string Password.
 	 * @Assert\MinLength(limit=6, message="password_too_short")
@@ -31,10 +31,10 @@ class SignupDataUserPass extends AbstractType {
 	protected $username;
 
 	public function buildForm(FormBuilderInterface $fbi, array $options) {
-		$fbi->add('firstName', 'text', array('label' => 'first_name',
-		        'required' => true, 'trim' => true, 'max_length' => 60));
-		$fbi->add('lastName', 'text', array('label' => 'last_name',
-		        'required' => true, 'trim' => true, 'max_length' => 60));
+		$fbi->add('fullName', 'text', array('label' => 'name', 'required' => true,
+		        'trim' => true, 'max_length' => 60));
+		$fbi->add('email', 'email', array('label' => 'email', 'required' => true,
+			'trim' => true, 'max_length' => 60));
 		$fbi->add('username', 'text', array('label' => 'username',
 		        'required' => true, 'trim' => true, 'max_length' => 254));
 		$fbi->add('password', 'repeated', array('type' => 'password',
@@ -43,19 +43,19 @@ class SignupDataUserPass extends AbstractType {
 	}
 
 	/**
-	 * Getter method for first name field.
-	 * @return string First name
+	 * Getter method for email field.
+	 * @return string Email field.
 	 */
-	public function getFirstName() {
-		return $this->firstName;
+	public function getEmail() {
+		return $this->email;
 	}
 
 	/**
-	 * Getter method for last name.
-	 * @return string Last name.
+	 * Getter method for name.
+	 * @return string Name.
 	 */
-	public function getLastName() {
-		return $this->lastName;
+	public function getFullName() {
+		return $this->fullName;
 	}
 
 	/**
@@ -84,12 +84,12 @@ class SignupDataUserPass extends AbstractType {
 	}
 
 	/**
-	 * Setter method for first name field.
-	 * @param string $firstName New value for first name.
-	 * @return SignupDdataOpenId This.
+	 * Setter method for email field.
+	 * @param $email string New value for email field.
+	 * @return SignupDataUserPass This.
 	 */
-	public function setFirstName($firstName) {
-		$this->firstName = $firstName;
+	public function setEmail($email) {
+		$this->email = $email;
 		return $this;
 	}
 
@@ -98,8 +98,8 @@ class SignupDataUserPass extends AbstractType {
 	 * @param string $lastName New value for last name.
 	 * @return SignupDataOpenId This.
 	 */
-	public function setLastName($lastName) {
-		$this->lastName = $lastName;
+	public function setFullName($fullName) {
+		$this->fullName = $fullName;
 	}
 
 	/**
