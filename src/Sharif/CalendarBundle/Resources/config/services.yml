@@ -7,3 +7,8 @@ services:
         class: 'Sharif\CalendarBundle\Security\UserRepository'
         arguments:
             entityManager: '@doctrine.orm.entity_manager'
+
+    sharif.calendar.date_manipulation_extension:
+        class: Sharif\CalendarBundle\Twig\DateManipulationExtension
+        tags:
+            - { name: twig.extension }
