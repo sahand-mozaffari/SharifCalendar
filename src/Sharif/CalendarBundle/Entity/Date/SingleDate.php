@@ -5,8 +5,6 @@ use \jCalendar;
 use \Hijri_GregorianConvert;
 use doctrine\Orm\Mapping as ORM;
 use sharif\Calendarbundle\Entity\User;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Optionsresolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\DateTime;
 
@@ -50,7 +48,17 @@ class SingleDate extends AbstractDate {
 	 * @param int $month month.
 	 * @param int $day day.
 	 */
-	public function __construct($year, $month, $day, $type='Gregorian') {
+	public function __construct($year = null, $month = null, $day = null,
+	                            $type='Gregorian') {
+		if($year == null) {
+			$year = intval(date("Y"));
+		}
+		if($month == null) {
+			$month = intval(date("n"));
+		}
+		if($day == null) {
+			$day = intval(date("j"));
+		}
 		$this->setYear($year);
 		$this->setMonth($month);
 		$this->setDay($day);
@@ -58,14 +66,12 @@ class SingleDate extends AbstractDate {
 	}
 
 	/**
-	 * @inheritdoc
+	 * Casts this date to a date of another type.
+	 * @param $type string The other type. This argument can be any of
+	 * 'Gregorian', 'Jalai' or 'Lunar-Hijri'.
+	 * @return SingleDate The casted date.
+	 * @throws RuntimeException When invalid argument is supplied.
 	 */
-	public function buildForm(FormBuilderInterface $builder, array $options) {
-		$builder->add('integer', array('precision' => 0, 'label' => 'year'));
-		$builder->add('integer', array('precision' => 0, 'label' => 'month'));
-		$builder->add('integer', array('precision' => 0, 'label' => 'day'));
-	}
-
 	public function castTo($type) {
 		switch($this->type) {
 			case 'Gregorian':
@@ -77,8 +83,8 @@ class SingleDate extends AbstractDate {
 					case 'Jalali':
 						return $this->gregorianToJalali();
 					default:
-						throw RuntimeException(
-								'Invalid date type: ['.$type.']');
+						throw new \RuntimeException(
+							'Invalid date type: ['.$type.']');
 				}
 				break;
 			case 'Lunar-Hijri':
@@ -130,13 +136,6 @@ class SingleDate extends AbstractDate {
 	}
 
 	/**
-	 * @inheritdoc
-	 */
-	public function getName() {
-		return 'singledate';
-	}
-
-	/**
 	 * getter method for year field.
 	 * @return int year
 	 */
@@ -169,6 +168,30 @@ class SingleDate extends AbstractDate {
 	}
 
 	/**
+	 * Determines whether or not a given date happens after this day.
+	 * @param SingleDate $that The other date.
+	 * @return bool Whether or not a given date happens after this day.
+	 */
+	public function isGreaterThan(SingleDate $that) {
+		return $this->year > $that->year ||
+			$this->year == $that->year && $this->month > $that->month ||
+			$this->year == $that->year && $this->month == $that->month &&
+				$this->day > $that->day;
+	}
+
+	/**
+	 * Determines whether or not a given date happens before this day.
+	 * @param SingleDate $that The other date.
+	 * @return bool Whether or not a given date happens before this day.
+	 */
+	public function isLessThan(SingleDate $that) {
+		return $this->year < $that->year ||
+			$this->year == $that->year && $this->month < $that->month ||
+			$this->year == $that->year && $this->month == $that->month &&
+				$this->day < $that->day;
+	}
+
+	/**
 	 * Casts this date from Jalali to Gregorian.
 	 * @return SingleDate Gregorian representation of this date.
 	 */
@@ -197,7 +220,7 @@ class SingleDate extends AbstractDate {
 				sprintf("%04d/%02d/%02d", $this->getYear(), $this->getMonth(),
 				$this->getDay()), 'YYYY/MM/DD');
 		$arr = explode('-', $str);
-		return new SingleDate($arr[0], $arr[1], $arr[2], 'Gregorian');
+		return new SingleDate($arr[2], $arr[1], $arr[0], 'Gregorian');
 	}
 
 	/**
@@ -225,20 +248,11 @@ class SingleDate extends AbstractDate {
 	/**
 	 * setter method for day field.
 	 * @param int $year new value for year.
-	 * @return singledate $this.
+	 * @return SingleDate $this.
 	 */
 	public function setDay($day) {
 		$this->day = $day;
 		return $this;
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function setDefaultOptions(OptionsResolverInterface $resolver) {
-		parent::setdefaultoptions($resolver);
-		$resolver->setdefaults(array('data_class' =>
-				'sharif\Calendarbundle\Entity\Date\Singledate'));
 	}
 
 	/**

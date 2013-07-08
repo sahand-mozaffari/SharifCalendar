@@ -23,6 +23,11 @@ class User implements UserInterface, \Serializable {
 	 */
 	protected $id;
 	/**
+	 * @var Label[] Labels held by this user.
+	 * @ORM\OneToMany(targetEntity="Label", mappedBy="owner")
+	 */
+	protected $labels;
+	/**
 	 * @var string This User's last name.
 	 * @ORM\Column(type="string", length=100, nullable=false)
 	 */
@@ -54,6 +59,7 @@ class User implements UserInterface, \Serializable {
 	 */
 	public function __construct($name, $email, $username=null, $password=null) {
 		$this->openIds = new ArrayCollection();
+		$this->labels = new ArrayCollection();
 		$this->setName($name);
 		$this->setEmail($email);
 		$this->setUserName($username);
@@ -160,9 +166,9 @@ class User implements UserInterface, \Serializable {
 	}
 
 	public function serialize() {
-		return serialize(
-		        array($this->id, $this->name, $this->openIds, $this->password,
-		        $this->salt, $this->username));
+		return serialize(array($this->id, $this->name, $this->openIds,
+			$this->password, $this->salt, $this->username, $this->email,
+			$this->labels));
 	}
 
 	/**
@@ -212,7 +218,7 @@ class User implements UserInterface, \Serializable {
 	 * @param string $unhashed Unhashed password to be set to this user.
 	 * @return User This.
 	 */
-	public function setPasswordUnhashed($unhashed) {
+	private function setPasswordUnhashed($unhashed) {
 		$generator = new SecureRandom();
 		$this->setSalt(base64_encode($generator->nextBytes(15)));
 
@@ -255,5 +261,40 @@ class User implements UserInterface, \Serializable {
 		$this->password = $arr[3];
 		$this->salt = $arr[4];
 		$this->username = $arr[5];
+		$this->email = $arr[6];
+		$this->labels = $arr[7];
 	}
+
+    /**
+     * Add labels
+     *
+     * @param \Sharif\CalendarBundle\Entity\Label $labels
+     * @return User
+     */
+    public function addLabel(\Sharif\CalendarBundle\Entity\Label $labels)
+    {
+        $this->labels[] = $labels;
+
+        return $this;
+    }
+
+    /**
+     * Remove labels
+     *
+     * @param \Sharif\CalendarBundle\Entity\Label $labels
+     */
+    public function removeLabel(\Sharif\CalendarBundle\Entity\Label $labels)
+    {
+        $this->labels->removeElement($labels);
+    }
+
+    /**
+     * Get labels
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getLabels()
+    {
+        return $this->labels;
+    }
 }

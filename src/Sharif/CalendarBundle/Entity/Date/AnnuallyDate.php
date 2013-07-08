@@ -1,33 +1,30 @@
 <?php
-//namespace Sharif\CalendarBundle\Entity\Date;
-//use Doctrine\ORM\Mapping as ORM;
-//use Sharif\CalendarBundle\Entity\User;
-//use Symfony\Component\Form\FormBuilderInterface;
-//use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-//use Symfony\Component\Validator\Constraints as Assert;
-//
-//class annuallydate extends AbstractDate {
-//
-//	/**
-//	 * @inheritdoc
-//	 */
-//	public function matches(SingleDate $date) {
-//		// TODO: Implement matches() method.
-//	}
-//
-//	/**
-//	 * @inheritdoc
-//	 */
-//	public function getName() {
-//		return 'annuallyDate';
-//	}
-//
-//	/**
-//	 * @inheritdoc
-//	 */
-//	public function setdefaultoptions(optionsresolverinterface $resolver) {
-//		parent::setdefaultoptions($resolver);
-//		$resolver->setdefaults(array('data_class' =>
-//		'sharif\Calendarbundle\Entity\Date\Singledate'));
-//	}
-//}
+namespace Sharif\CalendarBundle\Entity\Date;
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * Class AnnuallyDate
+ * @package Sharif\CalendarBundle\Entity\Date
+ * @ORM\Entity
+ */
+class AnnuallyDate extends RecurringDate {
+	/**
+	 * @inheritdoc
+	 */
+	public function matches(SingleDate $date) {
+		$that = $date->castTo($this->type);
+
+		if($this->start != null && $that->isLessThan($this->start)) {
+			return false;
+		}
+
+		if($this->end != null && $that->isGreaterThan($this->end)) {
+			return false;
+		}
+
+		return $this->getBase()->getDay() == $that->getDay() &&
+			$this->getBase()->getMonth() == $that->getMonth() &&
+			($this->getBase()->getYear() - $that->getYear()) %
+				$this->getStep() == 0;
+	}
+}

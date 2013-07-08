@@ -10,9 +10,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="discriminator", type="string")
- * @ORM\DiscriminatorMap({"single"="SingleDate"})
+ * @ORM\DiscriminatorMap({"single"="SingleDate", "annual"="AnnuallyDate",
+ *      "daily"="DailyDate", "monthly"="MonthlyDate"})
  */
-abstract class AbstractDate extends AbstractType {
+abstract class AbstractDate {
 	/**
 	 * @var integer Unique key.
 	 * @ORM\Column(type="integer", nullable=false, unique=true)
