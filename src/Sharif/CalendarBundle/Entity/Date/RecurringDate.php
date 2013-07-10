@@ -10,17 +10,20 @@ use doctrine\Orm\Mapping as ORM;
 abstract class RecurringDate extends AbstractDate {
 	/**
 	 * @var SingleDate Base date.
-	 * @ORM\OneToOne(targetEntity="SingleDate", orphanRemoval=true)
+	 * @ORM\OneToOne(targetEntity="SingleDate", cascade="all",
+	 *      orphanRemoval=true)
 	 */
 	protected $base;
 	/**
 	 * @var SingleDate ending date of this recurrence.
-	 * @ORM\OneToOne(targetEntity="SingleDate", orphanRemoval=true)
+	 * @ORM\OneToOne(targetEntity="SingleDate", cascade="all",
+	 *      orphanRemoval=true)
 	 */
 	protected $end;
 	/**
 	 * @var SingleDate Starting date of this recurrence.
-	 * @ORM\OneToOne(targetEntity="SingleDate", orphanRemoval=true)
+	 * @ORM\OneToOne(targetEntity="SingleDate", cascade="all",
+	 *      orphanRemoval=true)
 	 */
 	protected $start;
 	/**
@@ -29,6 +32,13 @@ abstract class RecurringDate extends AbstractDate {
 	 */
 	protected $step;
 
+	/**
+	 * Constructor
+	 * @param null $base Base date.
+	 * @param null $start Start date.
+	 * @param null $end End date.
+	 * @param int $step Every ?th period.
+	 */
 	public function __construct($base=null, $start=null, $end=null, $step = 1) {
 		if($base == null) {
 			$base = new SingleDate();

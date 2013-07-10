@@ -2,16 +2,17 @@
 namespace Sharif\CalendarBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Sharif\CalendarBundle\Twig\TreeInterface;
 
 /**
  * Class Label
  * @package Sharif\CalendarBundle\Entity
  * @ORM\Entity
  */
-class Label {
+class Label implements \Serializable {
 	/**
 	 * @var Label[] Children of this label.
-	 * @ORM\OneToMany(targetEntity="Label", mappedBy="parent")
+	 * @ORM\OneToMany(targetEntity="Label", mappedBy="parent", cascade="all")
 	 */
 	protected $children;
 	/**
@@ -39,7 +40,7 @@ class Label {
 	protected $name;
 	/**
 	 * @var Label Parent label.
-	 * @ORM\ManyToOne(targetEntity="Label")
+	 * @ORM\ManyToOne(targetEntity="Label", inversedBy="children")
 	 * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
 	 */
 	protected $parent;
@@ -51,7 +52,7 @@ class Label {
 	 * @param int $color Color.
 	 * @param $parent Parent.
 	 */
-	public function __construct($owner, $name, $color=0xCCCCCC, $parent) {
+	public function __construct($owner, $name, $color=0xCCCCCC, $parent=null) {
 		$this->children = new ArrayCollection();
 		$this->color = $color;
 		$this->name = $name;
@@ -70,6 +71,13 @@ class Label {
 	}
 
 	/**
+	 * Removes all the children.
+	 */
+	public function clearChildren() {
+		$this->children->clear();
+	}
+
+	/**
 	 * Get children
 	 * @return \Doctrine\Common\Collections\Collection Children
 	 */
@@ -83,6 +91,14 @@ class Label {
 	 */
 	public function getColor() {
 		return $this->color;
+	}
+
+	/**
+	 * Getter method for ID field.
+	 * @return int Unique ID
+	 */
+	public function getId() {
+		return $this->id;
 	}
 
 	/**
@@ -110,22 +126,19 @@ class Label {
 	}
 
 	/**
-	 * Set owner
-	 * @param \Sharif\CalendarBundle\Entity\User $owner User who owns this
-	 *  label.
-	 * @return Label $this.
-	 */
-	public function setOwner(User $owner = null) {
-		$this->owner = $owner;
-		return $this;
-	}
-
-	/**
 	 * Remove children
 	 * @param Label $children Children to be removed.
 	 */
 	public function removeChild(\Sharif\CalendarBundle\Entity\Label $children) {
 		$this->children->removeElement($children);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function serialize() {
+		return serialize(array($this->children, $this->color, $this->id,
+			$this->name, $this->owner, $this->parent));
 	}
 
 	/**
@@ -135,6 +148,16 @@ class Label {
 	 */
 	public function setColor($color) {
 		$this->color = $color;
+		return $this;
+	}
+
+	/**
+	 * Setter method for id field.
+	 * @param $id int Unique ID.
+	 * @return $this
+	 */
+	public function setId($id) {
+		$this->id = $id;
 		return $this;
 	}
 
@@ -149,6 +172,17 @@ class Label {
 	}
 
 	/**
+	 * Set owner
+	 * @param \Sharif\CalendarBundle\Entity\User $owner User who owns this
+	 *  label.
+	 * @return Label $this.
+	 */
+	public function setOwner(User $owner = null) {
+		$this->owner = $owner;
+		return $this;
+	}
+
+	/**
 	 * Setter method for parent field.
 	 * @param Label $parent parent label.
 	 * @return $this
@@ -157,4 +191,19 @@ class Label {
 		$this->parent = $parent;
 		return $this;
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function unserialize($serialized) {
+		$arr = unserialize($serialized);
+		$this->children = $arr[0];
+		$this->color = $arr[1];
+		$this->id = $arr[2];
+		$this->name = $arr[3];
+		$this->owner = $arr[4];
+		$this->parent = $arr[5];
+	}
+
+
 }

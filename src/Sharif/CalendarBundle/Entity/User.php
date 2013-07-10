@@ -16,6 +16,19 @@ class User implements UserInterface, \Serializable {
 	 */
 	protected $email;
 	/**
+	 * @var Event Events subscribed by this user.
+	 * @ORM\ManyToMany(targetEntity="Event")
+	 * @ORM\JoinTable(name="users_events",
+	 *      joinColumns={
+	 *          @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+	 *      },
+	 *      inverseJoinColumns={
+	 *          @ORM\JoinColumn(name="event_id", referencedColumnName="id")
+	 *      }
+	 * )
+	 */
+	protected $events;
+	/**
 	 * @var integer Unique key
 	 * @ORM\Column(type="integer", nullable=false, unique=true)
 	 * @ORM\GeneratedValue(strategy="AUTO")
@@ -24,7 +37,7 @@ class User implements UserInterface, \Serializable {
 	protected $id;
 	/**
 	 * @var Label[] Labels held by this user.
-	 * @ORM\OneToMany(targetEntity="Label", mappedBy="owner")
+	 * @ORM\OneToMany(targetEntity="Label", mappedBy="owner", cascade="all", orphanRemoval=true)
 	 */
 	protected $labels;
 	/**
@@ -60,10 +73,21 @@ class User implements UserInterface, \Serializable {
 	public function __construct($name, $email, $username=null, $password=null) {
 		$this->openIds = new ArrayCollection();
 		$this->labels = new ArrayCollection();
+		$this->events = new ArrayCollection();
 		$this->setName($name);
 		$this->setEmail($email);
 		$this->setUserName($username);
 		$this->setPasswordUnhashed($password);
+	}
+
+	/**
+	 * Add labels
+	 * @param Label $labels Labels to be added.
+	 * @return User $this
+	 */
+	public function addLabel(\Sharif\CalendarBundle\Entity\Label $labels) {
+		$this->labels[] = $labels;
+		return $this;
 	}
 
 	/**
@@ -74,6 +98,13 @@ class User implements UserInterface, \Serializable {
 	public function addOpenId(OpenIdIdentity $openIds) {
 		$this->openIds[] = $openIds;
 		return $this;
+	}
+
+	/**
+	 * Clears user's labels.
+	 */
+	public function clearLabels() {
+		$this->labels = new ArrayCollection();
 	}
 
 	/**
@@ -97,6 +128,14 @@ class User implements UserInterface, \Serializable {
 	 */
 	public function getId() {
 		return $this->id;
+	}
+
+	/**
+	 * Get labels
+	 * @return \Doctrine\Common\Collections\Collection Labels
+	 */
+	public function getLabels() {
+		return $this->labels;
 	}
 
 	/**
@@ -158,6 +197,14 @@ class User implements UserInterface, \Serializable {
 	}
 
 	/**
+	 * Remove labels
+	 * @param Label $labels Labels to be removed.
+	 */
+	public function removeLabel(\Sharif\CalendarBundle\Entity\Label $labels) {
+		$this->labels->removeElement($labels);
+	}
+
+	/**
 	 * Remove openIds
 	 * @param OpenIdIdentity OpenID to be removed.
 	 */
@@ -168,7 +215,7 @@ class User implements UserInterface, \Serializable {
 	public function serialize() {
 		return serialize(array($this->id, $this->name, $this->openIds,
 			$this->password, $this->salt, $this->username, $this->email,
-			$this->labels));
+			$this->labels, $this->events));
 	}
 
 	/**
@@ -263,38 +310,6 @@ class User implements UserInterface, \Serializable {
 		$this->username = $arr[5];
 		$this->email = $arr[6];
 		$this->labels = $arr[7];
+		$this->events = $arr[8];
 	}
-
-    /**
-     * Add labels
-     *
-     * @param \Sharif\CalendarBundle\Entity\Label $labels
-     * @return User
-     */
-    public function addLabel(\Sharif\CalendarBundle\Entity\Label $labels)
-    {
-        $this->labels[] = $labels;
-
-        return $this;
-    }
-
-    /**
-     * Remove labels
-     *
-     * @param \Sharif\CalendarBundle\Entity\Label $labels
-     */
-    public function removeLabel(\Sharif\CalendarBundle\Entity\Label $labels)
-    {
-        $this->labels->removeElement($labels);
-    }
-
-    /**
-     * Get labels
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getLabels()
-    {
-        return $this->labels;
-    }
 }

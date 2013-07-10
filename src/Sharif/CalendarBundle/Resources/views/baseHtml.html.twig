@@ -5,10 +5,19 @@
 			<meta charset="UTF-8" />
 			<title>
 				{% block title %}
-					{{ 'sharif_calendar'|trans|humanize }}
+					{{ 'sharif_calendar'|trans|capitalize }}
 				{% endblock %}
 			</title>
 			{% block stylesheets %}
+				{% stylesheets
+				    '@SharifCalendarBundle/Resources/public/css/JQueryUI/ui-lightness/jquery-ui-1.10.3.custom.min.css'
+				    '@SharifCalendarBundle/Resources/public/css/noty/buttons.css'
+				    filter='cssrewrite'
+				    %}
+					<link rel="stylesheet" href="{{ asset_url }}" />
+					<link href="http://cdn.kendostatic.com/2013.1.514/styles/kendo.common.min.css" rel="stylesheet">
+					<link href="http://cdn.kendostatic.com/2013.1.514/styles/kendo.default.min.css" rel="stylesheet">
+				{% endstylesheets %}
 			{% endblock stylesheets %}
 			<link rel="icon" type="image/x-icon"
 					href="{{ asset('favicon.ico') }}" />
@@ -16,6 +25,20 @@
 	</head>
 	<body>
 		{% block body %}{% endblock body %}
-		{% block javascripts %}{% endblock javascripts %}
+
+		{% block javascripts %}
+			<script src="http://cdn.kendostatic.com/2013.1.514/js/jquery.min.js"></script>
+			{% javascripts
+			    '@SharifCalendarBundle/Resources/public/js/JQueryUi/jquery-ui-1.10.3.custom.min.js'
+			    '@SharifCalendarBundle/Resources/public/js/noty/jquery.noty.js'
+			    '@SharifCalendarBundle/Resources/public/js/noty/layouts/top.js'
+			    '@SharifCalendarBundle/Resources/public/js/noty/layouts/topLeft.js'
+			    '@SharifCalendarBundle/Resources/public/js/noty/layouts/topRight.js'
+			    '@SharifCalendarBundle/Resources/public/js/noty/themes/default.js'
+			    %}
+				<script type="text/javascript" src="{{ asset_url }}"></script>
+			{% endjavascripts %}
+			<script src="http://cdn.kendostatic.com/2013.1.514/js/kendo.all.min.js"></script>
+		{% endblock javascripts %}
 	</body>
 </html>

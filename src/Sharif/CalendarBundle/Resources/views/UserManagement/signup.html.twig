@@ -29,14 +29,3 @@
 		<input type='submit' value="{{ 'register'|trans }}" />
 	</form>
 {% endblock body %}
-
-{% block javascripts %}
-	{{ parent() }}
-	{% javascripts
-			'@SharifCalendarBundle/Resources/public/js/jquery-2.0.1.min.js'%}
-		<script src="{{ asset_url }}" type="text/javascript"></script>
-	{% endjavascripts %}
-	{% javascripts '@SharifCalendarBundle/Resources/public/js/signup/main.js'%}
-		<script src="{{ asset_url }}" type="text/javascript"></script>
-	{% endjavascripts %}
-{% endblock javascripts %}

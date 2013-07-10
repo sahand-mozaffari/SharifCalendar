@@ -9,12 +9,12 @@ use Sharif\CalendarBundle\Entity\Date\AbstractDate;
  * @package Sharif\CalendarBundle\Entity
  * @ORM\Entity
  */
-class Event {
+class Event implements \Serializable {
 	/**
 	 * @var AbstractDate Date.
 	 * @ORM\OneToOne(
 	 *      targetEntity="Sharif\CalendarBundle\Entity\Date\AbstractDate",
-	 *      orphanRemoval=true)
+	 *      cascade="all", orphanRemoval=true)
 	 */
 	protected $date;
 	/**
@@ -31,8 +31,17 @@ class Event {
 	protected $id;
 	/**
 	 * @var Label[] Labels associated to this event.
-	 * @ORM\ManyToMany(targetEntity="Label", inversedBy="events")
-	 * @ORM\JoinTable(name="events_labels")
+	 * @ORM\ManyToMany(targetEntity="Label")
+	 * @ORM\JoinTable(name="users_groups",
+	 *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+	 *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id")}
+	 *      )
+	 * @ORM\JoinTable(name="events_labels",
+	 *      joinColumns={
+	 *          @ORM\JoinColumn(name="event_id", referencedColumnName="id")
+	 *      }, inverseJoinColumns={
+	 *          @ORM\JoinColumn(name="label_id", referencedColumnName="id")}
+	 *      ))
 	 */
 	protected $labels;
 	/**
@@ -182,4 +191,27 @@ class Event {
 	public function setTitle($title) {
 		$this->title = $title;
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function serialize() {
+		serialize(array($this->date, $this->description, $this->id,
+			$this->labels, $this->owner, $this->title));
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function unserialize($serialized) {
+		$arr = unserialize($serialized);
+		$this->date = $arr[0];
+		$this->description = $arr[1];
+		$this->id = $arr[2];
+		$this->labels = $arr[3];
+		$this->owner = $arr[4];
+		$this->title = $arr[5];
+	}
+
+
 }

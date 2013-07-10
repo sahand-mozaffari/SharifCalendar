@@ -2,16 +2,18 @@
 	namespace Sharif\CalendarBundle\Twig;
 
 	use \DateTime;
+	use \Hijri_GregorianConvert;
 	use \jCalendar;
 	use \Twig_Extension;
 	use \Twig_SimpleFilter;
-	use \Hijri_GregorianConvert;
 
 	/**
 	 * Twig extension for manipulation of DateTime objects.
 	 */
-	class DateManipulationExtension extends Twig_Extension
-	{
+	class DateManipulationExtension extends Twig_Extension {
+		/**
+		 * @inheritdoc
+		 */
 		public function getFilters() {
 			return array(
 				new \Twig_SimpleFilter('gregorian',
@@ -24,9 +26,7 @@
 		}
 
 		/**
-		 * Returns the name of the extension.
-		 *
-		 * @return string The extension name
+		 * @inheritdoc
 		 */
 		public function getName() {
 			return 'date_manipulation_extension';
