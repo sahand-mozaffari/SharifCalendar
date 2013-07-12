@@ -1,0 +1,42 @@
+<?php
+namespace Sharif\CalendarBundle\FormData\Transformer;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Form\DataTransformerInterface;
+
+class LabelsTransformer implements DataTransformerInterface {
+	/**
+	 * @inheritdoc
+	 */
+	public function transform($value) {
+		var_dump($value);
+		if($value == null) {
+			return "";
+		}
+		echo "TODO![LabelTransform.php]";
+		die();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function reverseTransform($value) {
+		if($value == null) {
+			return new ArrayCollection();
+		} else {
+			$arr = json_decode($value);
+			global $kernel;
+			if ('AppCache' == get_class($kernel)) {
+				$kernel = $kernel->getKernel();
+			}
+			$doctrine = $kernel->getContainer()->get('doctrine');
+			$repository =
+				$doctrine->getRepository('SharifCalendarBundle:Label');
+
+			$result = new ArrayCollection();
+			foreach($arr as $id) {
+				$result[] = $repository->findOneById($id);
+			}
+			return $result;
+		}
+	}
+}

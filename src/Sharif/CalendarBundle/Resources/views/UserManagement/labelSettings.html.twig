@@ -86,7 +86,6 @@
 				color:  "#cccccc",
 				image:  colorToImageUrl("#cccccc")
 			});
-			console.log('hi');
 			updateTreeView();
 		}
 
@@ -169,8 +168,9 @@
 			'cursor' : 'text',
 			'font' : 'inherit',
 			'outline' : 'none',
-			'text-align' : 'inherit'
-		});
+			'text-align' : 'inherit',
+			'background' : 'white'
+		}).unbind('mousedown');
 		$("#colorPicker").kendoColorPicker();
 
 		nodes = $("#label-tree li");

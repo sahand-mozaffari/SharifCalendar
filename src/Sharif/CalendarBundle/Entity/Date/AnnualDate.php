@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @package Sharif\CalendarBundle\Entity\Date
  * @ORM\Entity
  */
-class AnnuallyDate extends RecurringDate {
+class AnnualDate extends RecurringDate {
 	/**
 	 * @inheritdoc
 	 */

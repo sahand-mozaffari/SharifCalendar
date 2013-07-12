@@ -3,6 +3,11 @@ sharif_calendar_homepage:
     defaults:
         _controller:    SharifCalendarBundle:Default:index
 
+sharif_calendar_calendar:
+    pattern:    /user/calendar
+    defaults:
+        _controller:    SharifCalendarBundle:Events:calendar
+
 sharif_calendar_login:
     pattern:    /login
     defaults:

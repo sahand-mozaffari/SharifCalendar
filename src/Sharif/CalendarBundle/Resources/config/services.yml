@@ -1,27 +1,40 @@
 services:
+# Twig extensions
     sharif.calendar.date_manipulation_extension:
         class: Sharif\CalendarBundle\Twig\DateManipulationExtension
         tags:
             - { name: twig.extension }
 
-    sharif.calendar.openid_user_manager:
-        class: Sharif\CalendarBundle\Security\OpenIdUserManager
-        arguments: [@fp_openid.identity_manager, @doctrine.orm.entity_manager]
-
-    sharif.calendar.datetype:
-            class: Sharif\CalendarBundle\FormData\Date\DateType
+# Forms
+    sharif.calendar.date:
+            class: Sharif\CalendarBundle\FormData\Date\DateForm
             tags:
-                - { name: form.type, alias: datetype }
+                - { name: form.type, alias: date_form }
+
+    sharif.calendar.date_class:
+        class: Sharif\CalendarBundle\FormData\Date\DateClass
+        tags:
+            - { name: form.type, alias: date_class }
+
+    sharif.calendar.date_type:
+        class: Sharif\CalendarBundle\FormData\Date\DateType
+        tags:
+            - { name: form.type, alias: date_type }
 
     sharif.calendar.nullable_single_date:
-            class: Sharif\CalendarBundle\FormData\Transformer\NullableSingleDateForm
-            tags:
-                - { name: form.type, alias: nullable_single_date }
+        class: Sharif\CalendarBundle\FormData\Date\NullableSingleDateForm
+        tags:
+            - { name: form.type, alias: nullable_single_date }
 
     sharif.calendar.single_date:
         class: Sharif\CalendarBundle\FormData\Date\SingleDateForm
         tags:
             - { name: form.type, alias: single_date }
+
+# Other
+    sharif.calendar.openid_user_manager:
+        class: Sharif\CalendarBundle\Security\OpenIdUserManager
+        arguments: [@fp_openid.identity_manager, @doctrine.orm.entity_manager]
 
     user_provider:
         class: 'Sharif\CalendarBundle\Security\UserRepository'

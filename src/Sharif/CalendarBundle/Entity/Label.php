@@ -94,6 +94,18 @@ class Label implements \Serializable {
 	}
 
 	/**
+	 * Computes the full name of this label. e.g. grandpa/daddy/me
+	 * @return string Full name of this label.
+	 */
+	public function getFullName() {
+		if($this->parent == null) {
+			return $this->name;
+		} else {
+			return $this->parent->getFullName().' / '.$this->name;
+		}
+	}
+
+	/**
 	 * Getter method for ID field.
 	 * @return int Unique ID
 	 */

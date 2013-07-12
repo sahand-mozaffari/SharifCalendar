@@ -3,6 +3,7 @@ namespace Sharif\CalendarBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Sharif\CalendarBundle\Entity\Date\AbstractDate;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class Event
@@ -15,11 +16,13 @@ class Event implements \Serializable {
 	 * @ORM\OneToOne(
 	 *      targetEntity="Sharif\CalendarBundle\Entity\Date\AbstractDate",
 	 *      cascade="all", orphanRemoval=true)
+	 * @Assert\Valid()
 	 */
 	protected $date;
 	/**
 	 * @var string Description.
 	 * @ORM\Column(type="string", length=2000)
+	 * @Assert\MaxLength(limit=2000, message="description_too_at_most_2k_char")
 	 */
 	protected $description;
 	/**
@@ -52,6 +55,8 @@ class Event implements \Serializable {
 	/**
 	 * @var string Title
 	 * @ORM\Column(type="string", length=200)
+	 * @Assert\NotBlank(message="title_may_not_be_blank")
+	 * @Assert\MaxLength(limit=200, message="title_too_long")
 	 */
 	protected $title;
 
@@ -63,7 +68,13 @@ class Event implements \Serializable {
 	 * @param $date AbstractDate Date
 	 * @param array $labels Label[] Labels to be associated to this Event.
 	 */
-	function __construct($owner, $title, $description, $date, $labels=array()) {
+	function __construct($owner=null, $title="title", $description="desc",
+	                     $date=null, $labels=array()) {
+		global $kernel;
+		if ('AppCache' == get_class($kernel)) {
+			$kernel = $kernel->getKernel();
+		}
+
 		$this->labels = new ArrayCollection();
 		$this->owner = $owner;
 		$this->title = $title;

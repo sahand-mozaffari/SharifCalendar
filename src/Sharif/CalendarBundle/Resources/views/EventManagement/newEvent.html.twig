@@ -1,0 +1,194 @@
+{% extends "SharifCalendarBundle::baseHtml.html.twig" %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>
+		label {
+			display: inline-block;
+			width: 100px;
+		}
+
+		.k-editor {
+			border-radius: 7px;
+			display: inline-table;
+			width: 600px;
+			height: 350px;
+		}
+
+		.k-widget {
+			margin: 5px;
+		}
+
+		.k-multiselect {
+			margin-left: 0;
+			width: 600px;
+			display: inline-block;
+		}
+
+		#date-wrapper label {
+			display: inline-block;
+			font-size: xx-large;
+			color: #ffb500;
+			padding: 10px;
+			width: auto;
+		}
+
+		#date-wrapper label[for] {
+			font-size: inherit;
+			color: inherit;
+			padding: inherit;
+			width: 100px;
+		}
+
+		#event_title {
+			width:  600px;
+			margin-left: 5px;
+		}
+	</style>
+{% endblock stylesheets %}
+
+{% block body %}
+	<form id="event_form" method="POST">
+		{{ form_row(form.title) }}
+		{{ form_row(form.description) }}
+		{{ form_errors(form.labels) }}
+		{{ form_label(form.labels) }}
+		<select id="labels_select"></select>
+		{{ form_widget(form.labels) }}
+		<div id="date-wrapper">
+			<br/>
+			<hr/>
+			<br/>
+			{{ form_row(form.date.date_class) }}
+			<div id="single-date-container" class="date-container">
+				{{ form_row(form.date.single_date) }}
+			</div>
+			<div id="recurring-date-container" class="date-container">
+				{{ form_row(form.date.base_date) }}
+				{{ form_row(form.date.step) }}
+				{{ form_row(form.date.start_date) }}
+				{{ form_row(form.date.end_date) }}
+			</div>
+			<br/>
+			<hr/>
+			<br/>
+		</div>
+		<input type="submit" />
+		{{ form_rest(form) }}
+	</form>
+{% endblock body %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script id="itemTemplate" type="text/x-kendo-tmpl">
+		#: data.fullName #
+	</script>
+	<script id="tagTemplate" type="text/x-kendo-tmpl">
+		<span style="color: #: data.color#;"> #: data.name # </span>
+	</script>
+	<script>
+		$(document).ready(function(){
+			var date_date_class = $("#event_date_date_class");
+			var single_date_container = $('#single-date-container');
+			var recurring_date_container = $('#recurring-date-container');
+			var start_date_dateValue = $('#event_date_start_date_dateValue');
+			var start_date_hasValue = $('#event_date_start_date_hasValue');
+			var end_date_dateValue = $('#event_date_end_date_dateValue');
+			var end_date_hasValue = $('#event_date_end_date_hasValue');
+
+			if(date_date_class.val() == 'single') {
+				recurring_date_container.css('display', 'none');
+			} else {
+				single_date_container.css('display', 'none');
+			}
+			if(!start_date_hasValue.is(':checked')) {
+				start_date_dateValue.css('display', 'none');
+			}
+			if(!end_date_hasValue.is(':checked')) {
+				end_date_dateValue.css('display', 'none');
+			}
+
+			$('select[id!=labels_select]').kendoComboBox();
+			$('input[type=number][name*=year]').kendoNumericTextBox({
+				downArrowText: "Down",
+				format: "",
+				max: 3000,
+				min: 0,
+				spinners: false,
+				upArrowText: "Up"
+			});
+			$('input[type=number][name*=month]').kendoNumericTextBox({
+				downArrowText: "Down",
+				format: "",
+				max: 12,
+				min: 1,
+				spinners: false,
+				upArrowText: "Up"
+			});
+			$('input[type=number][name*=day]').kendoNumericTextBox({
+				downArrowText: "Down",
+				format: "",
+				max: 31,
+				min: 1,
+				spinners: false,
+				upArrowText: "Up"
+			});
+			$('input[type=number][name*=step]').kendoNumericTextBox({
+				downArrowText: "Down",
+				format: "",
+				min: 1,
+				upArrowText: "Up"
+			});
+			$('input[type=submit]').button();
+			$("#event_title").button().css({
+				'cursor' : 'text',
+				'font' : 'inherit',
+				'outline' : 'none',
+				'text-align' : 'inherit',
+				'background' : 'white'
+			}).unbind('mousedown');
+			$('#labels_select').kendoMultiSelect({
+				dataSource: {{ data|raw }},
+				dataTextField: 'name',
+				dataValueField: 'id',
+				filter: 'contains',
+				placeholder: '{{ 'no_labels'|trans|humanize }}',
+				itemTemplate: $("#itemTemplate").html(),
+				tagTemplate: $("#tagTemplate").html()
+			});
+			$("#event_description").kendoEditor({
+				tools: [
+					"bold", "italic", "underline", "strikethrough", "fontName",
+					"fontSize", "foreColor", "backColor", "justifyLeft",
+					"justifyCenter", "justifyRight", "justifyFull",
+					"insertUnorderedList", "insertOrderedList", "indent",
+					"outdent", "fomatting", "createLink", "unlink",
+					"insertImage", "subscript", "superscript", "createTable",
+					"addColumnLeft", "addColumnRight", "addRowAbove",
+					"addRowBelow", "deleteRow", "deleteColumn"
+				],
+				encoded: false
+			});
+			$('#event_form').submit(function(e) {
+				$('#event_labels').val(JSON.stringify(
+						$('#labels_select').data('kendoMultiSelect').value()));
+			});
+
+			date_date_class.change(function(){
+				if(date_date_class.val() == 'single') {
+					recurring_date_container.slideUp();
+					single_date_container.slideDown();
+				} else {
+					recurring_date_container.slideDown();
+					single_date_container.slideUp();
+				}
+			});
+			start_date_hasValue.change(function() {
+				start_date_dateValue.slideToggle();
+			});
+			end_date_hasValue.change(function() {
+				end_date_dateValue.slideToggle();
+			});
+		});
+	</script>
+{% endblock javascripts %}

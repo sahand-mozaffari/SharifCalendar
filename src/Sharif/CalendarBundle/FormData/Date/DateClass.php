@@ -3,12 +3,18 @@ namespace Sharif\CalendarBundle\FormData\Date;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class DateType extends AbstractType {
+class DateClass extends AbstractType {
+	protected $label;
+
+	function __construct($label='class') {
+		$this->label = $label;
+	}
+
 	/**
 	 * @inheritdoc
 	 */
 	public function getName() {
-		return 'date_type';
+		return 'date_class';
 	}
 
 	/**
@@ -31,13 +37,17 @@ class DateType extends AbstractType {
 		$resolver->setDefaults(array(
 			'choices' =>
 				array(
-					'Gregorian' =>
-						$translator->trans('gregorian', array(), 'submitFrom'),
-					'Jalali' =>
-						$translator->trans('jalali', array(), 'submitFrom'),
-					'Lunar-Hijri' =>
-						$translator->trans('lunar_hijri', array(), 'submitFrom')
-				), 'label' => 'type'
+					'single' =>
+						$translator->trans('single', array(), 'dateClass'),
+					'annual' =>
+						$translator->trans('annual', array(), 'dateClass'),
+					'monthly' =>
+						$translator->trans('monthly', array(), 'dateClass'),
+					'weekly' =>
+						$translator->trans('weekly', array(), 'dateClass'),
+					'daily' =>
+						$translator->trans('daily', array(), 'dateClass'),
+				), 'label' => $this->label
 		));
 	}
 }

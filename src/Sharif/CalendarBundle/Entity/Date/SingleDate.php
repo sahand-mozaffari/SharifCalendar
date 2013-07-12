@@ -35,9 +35,9 @@ class SingleDate extends AbstractDate {
 	 * @var int year.
 	 * @ORM\Column(type="integer", nullable=false)
 	 * @Assert\NotBlank(message="day_cant_be_blank")
-	 * @Assert\Range(min=1, max=31, minMessage="day_at_least_1",
-	 *      maxMessage="day_at_most_31",
-	 *      invalidMessage="day_not_valid_integer")
+	 * @Assert\Range(min=1, max=3000, minMessage="year_at_least_1",
+	 *      maxMessage="year_at_most_3000",
+	 *      invalidMessage="year_not_valid_integer")
 	 */
 	protected $year;
 

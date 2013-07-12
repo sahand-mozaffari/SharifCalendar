@@ -13,7 +13,7 @@ class SingleDateForm extends AbstractType{
 		$builder->add('year', 'integer', array('label' => 'year'));
 		$builder->add('month', 'integer', array('label' => 'month'));
 		$builder->add('day', 'integer', array('label' => 'day'));
-		$builder->add('type', 'datetype');
+		$builder->add('type', 'date_type');
 	}
 
 	/**

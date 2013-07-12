@@ -164,8 +164,6 @@ class UserManagementController extends Controller {
 
 		foreach($labels as $label) {
 			$index[$label->getId()] = $label;
-				echo $label->getId();
-				echo "-";
 				$dbIndex[$label->getId()] = $repository->findOneById($label->getId());
 			if($dbIndex[$label->getId()] == null) {
 				$dbIndex[$label->getId()] = $label;
