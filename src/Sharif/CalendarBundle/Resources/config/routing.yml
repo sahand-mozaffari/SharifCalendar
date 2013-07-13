@@ -26,6 +26,18 @@ sharif_calendar_new_event:
     defaults:
         _controller:    SharifCalendarBundle:Events:new
 
+sharif_calendar_query:
+    pattern:    /user/query/{fromYear}/{fromMonth}/{fromDay}/{toYear}/{toMonth}/{toDay}
+    defaults:
+        _controller:    SharifCalendarBundle:Events:getLabels
+    requirements:
+        from-year:  \d+
+        from-month: \d+
+        from-day:   \d+
+        to-year:    \d+
+        to-month:   \d+
+        to-day:     \d+
+
 sharif_calendar_setting_labels:
     pattern:    /user/setting/labels
     defaults:

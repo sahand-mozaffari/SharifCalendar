@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\DiscriminatorMap({"single"="SingleDate", "annual"="AnnualDate",
  *      "daily"="DailyDate", "monthly"="MonthlyDate"})
  */
-abstract class AbstractDate {
+abstract class AbstractDate implements \JsonSerializable {
 	/**
 	 * @var integer Unique key.
 	 * @ORM\Column(type="integer", nullable=false, unique=true)
@@ -44,6 +44,13 @@ abstract class AbstractDate {
 	 */
 	public function getType() {
 		return $this->type;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function jsonSerialize() {
+		return array('type' => $this->type);
 	}
 
 	/**

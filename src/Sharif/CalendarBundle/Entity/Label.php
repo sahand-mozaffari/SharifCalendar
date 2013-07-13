@@ -9,7 +9,7 @@ use Sharif\CalendarBundle\Twig\TreeInterface;
  * @package Sharif\CalendarBundle\Entity
  * @ORM\Entity
  */
-class Label implements \Serializable {
+class Label implements \Serializable, \JsonSerializable {
 	/**
 	 * @var Label[] Children of this label.
 	 * @ORM\OneToMany(targetEntity="Label", mappedBy="parent", cascade="all")
@@ -135,6 +135,13 @@ class Label implements \Serializable {
 	 */
 	public function getParent() {
 		return $this->parent;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function jsonSerialize() {
+		return array('color' => $this->color, 'name' => $this->name);
 	}
 
 	/**

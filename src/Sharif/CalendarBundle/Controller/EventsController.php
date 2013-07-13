@@ -7,6 +7,7 @@ use Sharif\CalendarBundle\Entity\Date\DailyDate;
 use Sharif\CalendarBundle\Entity\Date\SingleDate;
 use Sharif\CalendarBundle\FormData\EventForm;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class EventsController extends Controller {
 	private function copyDate($date) {
@@ -16,15 +17,18 @@ class EventsController extends Controller {
 				$date->getDay(), $date->getType());
 			case 'AnnualDate' :
 				return new AnnualDate($this->copyDate($date->getBase()),
-					$this->copyDate($date->getStart()), $this->copyDate($date->getEnd()),
+					$this->copyDate($date->getStart()),
+					$this->copyDate($date->getEnd()),
 					$date->getStep());
 			case 'MonthlyDate' :
 				return new MonthlyDate($this->copyDate($date->getBase()),
-					$this->copyDate($date->getStart()), $this->copyDate($date->getEnd()),
+					$this->copyDate($date->getStart()),
+					$this->copyDate($date->getEnd()),
 					$date->getStep());
 			case 'DailyDate' :
 				return new DailyDate($this->copyDate($date->getBase()),
-					$this->copyDate($date->getStart()), $this->copyDate($date->getEnd()),
+					$this->copyDate($date->getStart()),
+					$this->copyDate($date->getEnd()),
 					$date->getStep());
 			default:
 				return null;
@@ -87,6 +91,7 @@ class EventsController extends Controller {
 			if($form->isValid()) {
 				$event = $form->getData();
 				$event->setOwner($user);
+				$user->addEvent($event);
 				$em->persist($event);
 				$em->flush();
 				return $this->redirect('sharif_calendar_calendar');
@@ -105,5 +110,30 @@ class EventsController extends Controller {
 		return $this ->render(
 			'SharifCalendarBundle:EventManagement:newEvent.html.twig',
 			array('form' => $form->createView(), 'data' => json_encode($data)));
+	}
+
+	public function getLabelsAction($fromYear, $fromMonth, $fromDay, $toYear,
+	                                $toMonth, $toDay) {
+		$from = new SingleDate($fromYear,$fromMonth, $fromDay);
+		$to = new SingleDate($toYear,$toMonth, $toDay);
+		if($from->diff($to) > 370) {
+			return $this->createNotFoundException('GO away you spammer!');
+		}
+
+		$user = $this->getUser();
+		$events = $user->getEvents();
+
+		$result = array();
+		while(!$from->isGreaterThan($to)) {
+			foreach($events as $event) {
+				$date = $event->getDate();
+				if($date->matches($from)) {
+					$result[] = array('date' => $from, 'event' => $event);
+				}
+			}
+			$from = $from->add(1);
+		}
+
+		return new JsonResponse($result);
 	}
 }

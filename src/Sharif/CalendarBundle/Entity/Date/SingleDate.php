@@ -66,6 +66,20 @@ class SingleDate extends AbstractDate {
 	}
 
 	/**
+	 * Adds an specific amount of days to the this date.
+	 * @param $days int Number of days.
+	 * @return SingleDate New date.
+	 */
+	public function add($days) {
+		$date =  $this->toDate()->add(new \DateInterval('P'.$days.'D'));
+		$year = intval($date->format('Y'));
+		$month = intval($date->format('m'));
+		$day = intval($date->format('d'));
+		$newDate = new SingleDate($year, $month, $day);
+		return $newDate->castTo($this->type);
+	}
+
+	/**
 	 * Casts this date to a date of another type.
 	 * @param $type string The other type. This argument can be any of
 	 * 'Gregorian', 'Jalai' or 'Lunar-Hijri'.
@@ -120,6 +134,17 @@ class SingleDate extends AbstractDate {
 	}
 
 	/**
+	 * Computes the number of days between this and some given date.
+	 * @param $date SingleDate The other date.
+	 * @return SingleDate The difference in days.
+	 */
+	public function diff($date) {
+		$diff = $this->castTo('Gregorian')->toDate()->
+			diff($date->castTo('Gregorian')->toDate());
+		return $diff->days;
+	}
+
+	/**
 	 * getter method for day field.
 	 * @return int day.
 	 */
@@ -141,30 +166,6 @@ class SingleDate extends AbstractDate {
 	 */
 	public function getYear() {
 		return $this->year;
-	}
-
-	/**
-	 * Casts this date from Gregorian to Jalali.
-	 * @return SingleDate Jalali representation of this date.
-	 */
-	private function gregorianToJalali() {
-		$jcal = new jCalendar();
-		$arr = $jcal->getdate(mktime(null, null, null, $this->month, $this->day,
-				$this->year));
-		return new SingleDate($arr['year'], $arr['mon'], $arr['mday'],
-				'Jalali');
-	}
-
-	/**
-	 * Casts this date from Gregorian to Lunar Hijri.
-	 * @return SingleDate Lunar Hijri representation of this date.
-	 */
-	private function gregorianToLunarHijri() {
-		$DateConv = new Hijri_GregorianConvert();
-		$str = $DateConv->GregorianToHijri(date('Y/m/d', $this->toTimeStamp()),
-				'YYYY/MM/DD');
-		$arr = explode('-', $str);
-		return new SingleDate($arr[2], $arr[1], $arr[0], 'Lunar-Hijri');
 	}
 
 	/**
@@ -192,43 +193,11 @@ class SingleDate extends AbstractDate {
 	}
 
 	/**
-	 * Casts this date from Jalali to Gregorian.
-	 * @return SingleDate Gregorian representation of this date.
+	 * @inheritdoc
 	 */
-	private function jalaliToGregorian() {
-		$jcal = new jCalendar();
-		$arr = getDate($jcal->mktime(0, 0, 0, $this->month, $this->day,
-			$this->year));
-		return new SingleDate($arr['year'], $arr['mon'], $arr['mday']);
-	}
-
-	/**
-	 * Casts this date from Jalali to Lunar Hijri.
-	 * @return SingleDate Lunar Hijri representation of this date.
-	 */
-	private function jalaliToLunarHijri() {
-		return $this->jalaliToGregorian()->gregorianToLunarHijri();
-	}
-
-	/**
-	 * Casts this date from Lunar Hijri to Gregorian.
-	 * @return SingleDate Gregorian representation of this date.
-	 */
-	private function lunarHijriToGregorian() {
-		$DateConv = new Hijri_GregorianConvert();
-		$str = $DateConv->HijriToGregorian(
-				sprintf("%04d/%02d/%02d", $this->getYear(), $this->getMonth(),
-				$this->getDay()), 'YYYY/MM/DD');
-		$arr = explode('-', $str);
-		return new SingleDate($arr[2], $arr[1], $arr[0], 'Gregorian');
-	}
-
-	/**
-	 * Casts this date from Lunar Hijri to Jalali.
-	 * @return SingleDate Jalali representation of this date.
-	 */
-	private function lunarHijriToJalali() {
-		return $this->lunarHijriToGregorian()->gregorianToJalali();
+	public function jsonSerialize() {
+		return array_merge(parent::jsonSerialize(), array('year' => $this->year,
+			'month' => $this->month, 'day' => $this->day, 'class' => 'single'));
 	}
 
 	/**
@@ -284,5 +253,69 @@ class SingleDate extends AbstractDate {
 		$date =  new \DateTime();
 		return $date->setDate($gregorian->year, $gregorian->month,
 				$gregorian->day);
+	}
+
+	/**
+	 * Casts this date from Gregorian to Jalali.
+	 * @return SingleDate Jalali representation of this date.
+	 */
+	private function gregorianToJalali() {
+		$jcal = new jCalendar();
+		$arr = $jcal->getdate(mktime(null, null, null, $this->month, $this->day,
+			$this->year));
+		return new SingleDate($arr['year'], $arr['mon'], $arr['mday'],
+			'Jalali');
+	}
+
+	/**
+	 * Casts this date from Gregorian to Lunar Hijri.
+	 * @return SingleDate Lunar Hijri representation of this date.
+	 */
+	private function gregorianToLunarHijri() {
+		$DateConv = new Hijri_GregorianConvert();
+		$str = $DateConv->GregorianToHijri(date('Y/m/d', $this->toTimeStamp()),
+			'YYYY/MM/DD');
+		$arr = explode('-', $str);
+		return new SingleDate($arr[2], $arr[1], $arr[0], 'Lunar-Hijri');
+	}
+
+	/**
+	 * Casts this date from Jalali to Gregorian.
+	 * @return SingleDate Gregorian representation of this date.
+	 */
+	private function jalaliToGregorian() {
+		$jcal = new jCalendar();
+		$arr = getDate($jcal->mktime(0, 0, 0, $this->month, $this->day,
+			$this->year));
+		return new SingleDate($arr['year'], $arr['mon'], $arr['mday']);
+	}
+
+	/**
+	 * Casts this date from Jalali to Lunar Hijri.
+	 * @return SingleDate Lunar Hijri representation of this date.
+	 */
+	private function jalaliToLunarHijri() {
+		return $this->jalaliToGregorian()->gregorianToLunarHijri();
+	}
+
+	/**
+	 * Casts this date from Lunar Hijri to Gregorian.
+	 * @return SingleDate Gregorian representation of this date.
+	 */
+	private function lunarHijriToGregorian() {
+		$DateConv = new Hijri_GregorianConvert();
+		$str = $DateConv->HijriToGregorian(
+			sprintf("%04d/%02d/%02d", $this->getYear(), $this->getMonth(),
+				$this->getDay()), 'YYYY/MM/DD');
+		$arr = explode('-', $str);
+		return new SingleDate($arr[2], $arr[1], $arr[0], 'Gregorian');
+	}
+
+	/**
+	 * Casts this date from Lunar Hijri to Jalali.
+	 * @return SingleDate Jalali representation of this date.
+	 */
+	private function lunarHijriToJalali() {
+		return $this->lunarHijriToGregorian()->gregorianToJalali();
 	}
 }

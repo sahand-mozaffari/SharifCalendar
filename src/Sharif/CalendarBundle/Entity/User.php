@@ -81,6 +81,16 @@ class User implements UserInterface, \Serializable {
 	}
 
 	/**
+	 * Add events
+	 * @param Label $events Events to be added.
+	 * @return User $this
+	 */
+	public function addEvent(Event $events) {
+		$this->events[] = $events;
+		return $this;
+	}
+
+	/**
 	 * Add labels
 	 * @param Label $labels Labels to be added.
 	 * @return User $this
@@ -112,6 +122,14 @@ class User implements UserInterface, \Serializable {
 	 */
 	public function eraseCredentials() {
 		// nothing here...
+	}
+
+	/**
+	 * Getter method for event field.
+	 * @return Event[] Events.
+	 */
+	public function getEvents() {
+		return $this->events;
 	}
 
 	/**
@@ -194,6 +212,14 @@ class User implements UserInterface, \Serializable {
 	 */
 	public function getUsername() {
 		return $this->username;
+	}
+
+	/**
+	 * Remove events
+	 * @param Event $event Event to be removed.
+	 */
+	public function removeEvent(Event $event) {
+		$this->events->removeElement($event);
 	}
 
 	/**

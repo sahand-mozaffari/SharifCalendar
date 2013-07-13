@@ -7,7 +7,7 @@ use doctrine\Orm\Mapping as ORM;
  * @package Sharif\CalendarBundle\Entity\Date
  * Base class for recurring dates.
  */
-abstract class RecurringDate extends AbstractDate {
+abstract class RecurringDate extends AbstractDate implements \JsonSerializable {
 	/**
 	 * @var SingleDate Base date.
 	 * @ORM\OneToOne(targetEntity="SingleDate", cascade="all",
@@ -83,8 +83,23 @@ abstract class RecurringDate extends AbstractDate {
 		return $this->step;
 	}
 
+	/**
+	 * @inheritdoc
+	 */
+	public function jsonSerialize() {
+		return array_merge(parent::jsonSerialize(), array('base' => $this->base,
+			'start' => $this->start , 'end' => $this->end,
+			'step' => $this->step));
+	}
+
+	/**
+	 * Setter method for base date.
+	 * @param SingleDate $base Base date
+	 * @return $this
+	 */
 	public function setBase(SingleDate $base) {
 		$this->base = $base->castTo($this->type);
+		return $this;
 	}
 
 	/**

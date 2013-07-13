@@ -11,6 +11,13 @@ class DailyDate extends RecurringDate {
 	/**
 	 * @inheritdoc
 	 */
+	public function jsonSerialize() {
+		return array_merge(parent::jsonSerialize(), array('class' => 'daily'));
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function matches(SingleDate $date) {
 		$that = $date->castTo($this->type);
 

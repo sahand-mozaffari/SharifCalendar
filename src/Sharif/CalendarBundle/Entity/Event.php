@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @package Sharif\CalendarBundle\Entity
  * @ORM\Entity
  */
-class Event implements \Serializable {
+class Event implements \Serializable, \JsonSerializable {
 	/**
 	 * @var AbstractDate Date.
 	 * @ORM\OneToOne(
@@ -143,6 +143,14 @@ class Event implements \Serializable {
 	 */
 	public function getTitle() {
 		return $this->title;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function jsonSerialize() {
+		return array('date' => $this->date, 'description' => $this->description,
+			'label' => $this->labels, 'title' => $this->title);
 	}
 
 	/**
