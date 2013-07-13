@@ -53,7 +53,7 @@ abstract class AbstractDate {
 	 */
 	public function setId($id) {
 		$this->id = $id;
-		return $id;
+		return $this;
 	}
 
 	/**

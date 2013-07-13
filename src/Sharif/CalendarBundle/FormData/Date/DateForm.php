@@ -107,35 +107,35 @@ class DateForm extends AbstractType implements DataTransformerInterface {
 		} elseif($value instanceof AnnualDate) {
 			return array('date_class' => 'annual',
 				'single_date' => new SingleDate(),
-				'base_date' => $value->getBaseDate(),
-				'start_date' => $value->getStartDate(),
+				'base_date' => $value->getBase(),
+				'start_date' => $value->getStart(),
 				'step' => $value->getStep(),
-				'end_date' => $value->getEndDate()
+				'end_date' => $value->getEnd()
 			);
 		} elseif($value instanceof MonthlyDate) {
 			return array('date_class' => 'monthly',
 				'single_date' => new SingleDate(),
-				'base_date' => $value->getBaseDate(),
-				'start_date' => $value->getStartDate(),
+				'base_date' => $value->getBase(),
+				'start_date' => $value->getStart(),
 				'step' => $value->getStep(),
-				'end_date' => $value->getEndDate()
+				'end_date' => $value->getEnd()
 			);
 		} else { // ($value instanceof DailyDate)
 			if($value->getStep() % 7 == 0) {
 				return array('date_class' => 'weekly',
 					'single_date' => new SingleDate(),
-					'base_date' => $value->getBaseDate(),
-					'start_date' => $value->getStartDate(),
+					'base_date' => $value->getBase(),
+					'start_date' => $value->getStart(),
 					'step' => $value->getStep() / 7,
-					'end_date' => $value->getEndDate()
+					'end_date' => $value->getEnd()
 				);
 			} else {
 				return array('date_class' => 'daily',
 					'single_date' => new SingleDate(),
-					'base_date' => $value->getBaseDate(),
-					'start_date' => $value->getStartDate(),
+					'base_date' => $value->getBase(),
+					'start_date' => $value->getStart(),
 					'step' => $value->getStep(),
-					'end_date' => $value->getEndDate()
+					'end_date' => $value->getEnd()
 				);
 			}
 		}

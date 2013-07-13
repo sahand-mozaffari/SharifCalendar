@@ -154,7 +154,8 @@
 				filter: 'contains',
 				placeholder: '{{ 'no_labels'|trans|humanize }}',
 				itemTemplate: $("#itemTemplate").html(),
-				tagTemplate: $("#tagTemplate").html()
+				tagTemplate: $("#tagTemplate").html(),
+				value:  JSON.parse($('#event_labels').val())
 			});
 			$("#event_description").kendoEditor({
 				tools: [

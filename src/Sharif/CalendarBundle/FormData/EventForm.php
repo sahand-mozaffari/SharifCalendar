@@ -11,12 +11,37 @@ class EventForm  extends AbstractType {
 	 * @inheritdoc
 	 */
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		$builder->add('title', 'text', array('required' => true,
-			'max_length' => 200, 'label' => 'title', 'trim' => true ));
-		$builder->add('description', 'textarea', array('max_length' => 2000,
-			'label' => 'description', 'trim' => true));
-		$builder->add($builder->create('labels', 'hidden')->
+		$opts = array('required' => true, 'max_length' => 200,
+			'label' => 'title', 'trim' => true);
+		if(isset($options['data'])) {
+			$opts = array_merge($opts,
+				array('data' => $options['data']->getTitle()));
+		}
+		$builder->add('title', 'text', $opts);
+
+		$opts = array('max_length' => 2000, 'label' => 'description',
+			'trim' => true);
+		if(isset($options['data'])) {
+			$opts = array_merge($opts,
+				array('data' => $options['data']->getDescription()));
+		}
+		$builder->add('description', 'textarea', $opts);
+
+		$arr = array();
+		if(isset($options['data'])) {
+			foreach($options['data']->getLabels() as $label) {
+				$arr[] = $label->getId();
+			}
+		}
+		$builder->add($builder->create('labels', 'hidden',
+			array('data' => json_encode($arr)))->
 			addModelTransformer(new LabelsTransformer()));
+
+		$opts = array();
+		if(isset($options['data'])) {
+			$opts = array_merge($opts,
+				array('data' => $options['data']->getDate()));
+		}
 		$builder->add('date', 'date_form');
 	}
 

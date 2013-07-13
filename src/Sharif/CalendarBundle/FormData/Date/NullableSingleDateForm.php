@@ -49,7 +49,7 @@ class NullableSingleDateForm extends AbstractType
 		if($value == null) {
 			return array('dateValue' => new SingleDate(), 'hasValue' => false);
 		} else {
-			return array('dateValue' => $value, 'isNull' => true);
+			return array('dateValue' => $value, 'hasValue' => true);
 		}
 	}
 }

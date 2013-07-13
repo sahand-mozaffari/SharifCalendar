@@ -134,7 +134,7 @@ class Event implements \Serializable {
 	 * @return User Owner of this event.
 	 */
 	public function getOwner() {
-		return $this->user;
+		return $this->owner;
 	}
 
 	/**
@@ -181,6 +181,16 @@ class Event implements \Serializable {
 	 */
 	public function setId($id) {
 		$this->id = $id;
+		return $this;
+	}
+
+	/**
+	 * Setter method for labels field.
+	 * @param $labels Label[] New value for labels field.
+	 * @return $this
+	 */
+	public function setLabels($labels) {
+		$this->labels = $labels;
 		return $this;
 	}
 

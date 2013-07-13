@@ -7,18 +7,6 @@ class LabelsTransformer implements DataTransformerInterface {
 	/**
 	 * @inheritdoc
 	 */
-	public function transform($value) {
-		var_dump($value);
-		if($value == null) {
-			return "";
-		}
-		echo "TODO![LabelTransform.php]";
-		die();
-	}
-
-	/**
-	 * @inheritdoc
-	 */
 	public function reverseTransform($value) {
 		if($value == null) {
 			return new ArrayCollection();
@@ -38,5 +26,20 @@ class LabelsTransformer implements DataTransformerInterface {
 			}
 			return $result;
 		}
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function transform($value) {
+		if($value == null) {
+			return "";
+		}
+		return $value;
+//		$arr = array();
+//		foreach($value as $label) {
+//			$arr[] = $label->getId();
+//		}
+//		return json_encode($arr);
 	}
 }
