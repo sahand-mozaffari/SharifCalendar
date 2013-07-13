@@ -28,7 +28,7 @@ class UserRepository extends EntityRepository implements UserProviderInterface {
 		$em = $this->getEntityManager();
 		$query = $em
 		        ->createQuery(
-		                'SELECT u FROM Sharif\CalendarBundle\Entity\User u WHERE u.username=?1 OR 1=1')
+		                'SELECT u FROM Sharif\CalendarBundle\Entity\User u WHERE u.username=?1')
 		        ->setParameter(1, $username);
 		return $query->getSingleResult();
 	}
