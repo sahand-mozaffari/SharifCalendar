@@ -22,8 +22,8 @@ class UserManagementController extends Controller {
 		$result = array();
 		foreach($nodes as $node) {
 			$newLabel = (new Label(null, $node['name'],
-				intval('0X'.substr($node['color'], 1), 16), $parent))->
-				setId($node['id']);
+				intval('0X'.substr($node['color'], 1), 16), $parent,
+				$node['description'], $node['publicity']))->setId($node['id']);
 			if($parent != null) {
 				$parent->addChild($newLabel);
 			}
@@ -44,7 +44,9 @@ class UserManagementController extends Controller {
 	 */
 	private function encodeNode($node) {
 		$result = array('id' => $node->getId(), 'text' => $node->getName(),
-			'color' => sprintf("#%6X", $node->getColor()), 'image' => "");
+			'color' => sprintf("#%6X", $node->getColor()), 'image' => "",
+			'description' => $node->getDescription(),
+			'publicity' => $node->isPublic());
 		if(!$node->getChildren()->isEmpty()) {
 			$children = array();
 			foreach($node->getChildren() as $child) {
@@ -150,7 +152,8 @@ class UserManagementController extends Controller {
 
 	public function submitLabelsAction() {
 		$em = $this->getDoctrine()->getManager();
-		$repository = $this->getDoctrine()->getRepository('Sharif\CalendarBundle\Entity\Label');
+		$repository = $this->getDoctrine()->
+			getRepository('Sharif\CalendarBundle\Entity\Label');
 		$oldLabels = $this->getUser()->getLabels();
 		$this->getUser()->clearLabels();
 
@@ -164,13 +167,17 @@ class UserManagementController extends Controller {
 
 		foreach($labels as $label) {
 			$index[$label->getId()] = $label;
-				$dbIndex[$label->getId()] = $repository->findOneById($label->getId());
+				$dbIndex[$label->getId()] =
+					$repository->findOneById($label->getId());
 			if($dbIndex[$label->getId()] == null) {
 				$dbIndex[$label->getId()] = $label;
 				$label->setOwner($this->getUser());
 			} else {
 				$dbIndex[$label->getId()]->setName($label->getName());
 				$dbIndex[$label->getId()]->setColor($label->getColor());
+				$dbIndex[$label->getId()]->
+					setDescription($label->getDescription());
+				$dbIndex[$label->getId()]->setPublic($label->isPublic());
 			}
 			$dbIndex[$label->getId()]->clearChildren();
 			$index[$label->getId()]->clearChildren();
@@ -186,8 +193,15 @@ class UserManagementController extends Controller {
 			}
 			$this->getUser()->addLabel($dbIndex[$id]);
 		}
+		foreach(array_keys($index) as $id) {
+			$em->persist($dbIndex[$id]);
+		}
 		foreach($oldLabels as $oldLabel) {
-			if(!array_key_exists($oldLabel->getId(), array_keys($index))) {
+			if(!array_key_exists($oldLabel->getId(), $index)) {
+				foreach($oldLabel->getEvents() as $event) {
+					$event->removeLabel($oldLabel);
+					$em->persist($event);
+				}
 				$em->remove($oldLabel);
 			}
 		}

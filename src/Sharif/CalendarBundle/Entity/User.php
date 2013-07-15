@@ -62,6 +62,12 @@ class User implements UserInterface, \Serializable {
 	 */
 	protected $salt;
 	/**
+	 * @var Label[] Subscribed labels.
+	 * @ORM\ManyToMany(targetEntity="Label", inversedBy="subscribers")
+	 * @ORM\JoinTable(name="labels_subscribers")
+	 */
+	protected $subscribedLabels;
+	/**
 	 * @var string This User's unique name.
 	 * @ORM\Column(type="string", length=254, nullable=true, unique=true)
 	 */
@@ -73,7 +79,7 @@ class User implements UserInterface, \Serializable {
 	public function __construct($name, $email, $username=null, $password=null) {
 		$this->openIds = new ArrayCollection();
 		$this->labels = new ArrayCollection();
-		$this->events = new ArrayCollection();
+		$this->subscribedLabels = new ArrayCollection();
 		$this->setName($name);
 		$this->setEmail($email);
 		$this->setUserName($username);
@@ -95,7 +101,7 @@ class User implements UserInterface, \Serializable {
 	 * @param Label $labels Labels to be added.
 	 * @return User $this
 	 */
-	public function addLabel(\Sharif\CalendarBundle\Entity\Label $labels) {
+	public function addLabel(Label $labels) {
 		$this->labels[] = $labels;
 		return $this;
 	}
@@ -107,6 +113,16 @@ class User implements UserInterface, \Serializable {
 	 */
 	public function addOpenId(OpenIdIdentity $openIds) {
 		$this->openIds[] = $openIds;
+		return $this;
+	}
+
+	/**
+	 * Add label to subscribed label's list.
+	 * @param Label $label Label to be subscribed to.
+	 * @return $this.
+	 */
+	public function addSubscribedLabel(Label $label) {
+		$this->subscribedLabels[] = $label;
 		return $this;
 	}
 
@@ -125,7 +141,15 @@ class User implements UserInterface, \Serializable {
 	}
 
 	/**
-	 * Getter method for event field.
+	 * Getter method for all events.
+	 * @return Event[] all events.
+	 */
+	public function getAllEvents() {
+		return array_merge($this->getEvents()->toArray(), $this->getSubscribedEvents());
+	}
+
+	/**
+	 * Getter method for owned events.
 	 * @return Event[] Events.
 	 */
 	public function getEvents() {
@@ -207,6 +231,27 @@ class User implements UserInterface, \Serializable {
 	}
 
 	/**
+	 * Getter method for subscribed event.
+	 * @return Event[] Events.
+	 */
+	public function getSubscribedEvents() {
+		$result = array();
+		foreach($this->subscribedLabels as $label) {
+			$result = array_merge($result, $label->getEvents()->toArray());
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Getter method for subscribed labels.
+	 * @return Label[] subscribed labels
+	 */
+	public function getSubscribedLabels() {
+		return $this->subscribedLabels;
+	}
+
+	/**
 	 * Getter method for this user's user name.
 	 * @return string This user's user name.
 	 */
@@ -226,7 +271,7 @@ class User implements UserInterface, \Serializable {
 	 * Remove labels
 	 * @param Label $labels Labels to be removed.
 	 */
-	public function removeLabel(\Sharif\CalendarBundle\Entity\Label $labels) {
+	public function removeLabel(Label $labels) {
 		$this->labels->removeElement($labels);
 	}
 
@@ -238,10 +283,18 @@ class User implements UserInterface, \Serializable {
 		$this->openIds->removeElement($openIds);
 	}
 
+	/**
+	 * Remove labels from list of subscribed.
+	 * @param Label $labels Label to be removed.
+	 */
+	public function removeSubscribedLabel(Label $label) {
+		$this->subscribedLabels->removeElement($label);
+	}
+
 	public function serialize() {
-		return serialize(array($this->id, $this->name, $this->openIds,
+		return urlencode(serialize(array($this->id, $this->name, $this->openIds,
 			$this->password, $this->salt, $this->username, $this->email,
-			$this->labels, $this->events));
+			$this->labels, $this->events, $this->subscribedLabels)));
 	}
 
 	/**
@@ -327,7 +380,7 @@ class User implements UserInterface, \Serializable {
 	}
 
 	public function unserialize($serialized) {
-		$arr = unserialize($serialized);
+		$arr = unserialize(urldecode($serialized));
 		$this->id = $arr[0];
 		$this->name = $arr[1];
 		$this->openIds = $arr[2];
@@ -337,5 +390,6 @@ class User implements UserInterface, \Serializable {
 		$this->email = $arr[6];
 		$this->labels = $arr[7];
 		$this->events = $arr[8];
+		$this->subscribedLabels = $arr[9];
 	}
 }

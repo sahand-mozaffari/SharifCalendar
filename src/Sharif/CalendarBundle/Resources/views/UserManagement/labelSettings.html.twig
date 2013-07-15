@@ -7,8 +7,13 @@
 	<div id="tree-container"></div>
 	<div id="details" style="display: none">
 		<input id="text" type="text" />
+		<input id="description" type="text" />
 		<div id="colorPicker"></div>
-		<button data-role="button" id="removeButton">{{ 'remove'|trans|humanize }}</button>
+		<input id="publicity" type="checkbox"
+				value="{{ 'public'|trans|humanize }}" />
+		<button data-role="button" id="removeButton">
+			{{ 'remove'|trans|humanize }}
+		</button>
 	</div>
 	<button data-role="button" onclick="addClick()">{{ 'add'|trans|humanize }}</button>
 	<button data-role="button" onclick="submitClick()">{{ 'submit'|trans|humanize }}</button>
@@ -25,7 +30,9 @@
 				var result = {
 					"id": node.id,
 					"color": node.color,
-					"name": node.text
+					"name": node.text,
+					"description": node.description,
+					"publicity": node.publicity
 				};
 				if(node.hasChildren) {
 					result["items"] = [];
@@ -84,7 +91,9 @@
 				id: -++added_counter,
 				text:   "{{ 'new_label'|trans|capitalize }}",
 				color:  "#cccccc",
-				image:  colorToImageUrl("#cccccc")
+				image:  colorToImageUrl("#cccccc"),
+				description:    "",
+				publicity:  false
 			});
 			updateTreeView();
 		}
@@ -127,8 +136,12 @@
 			var colorPicker = $("#colorPicker").data("kendoColorPicker");
 			var removeButton = $('#removeButton');
 			var text = $("#text");
+			var description = $('#description');
+			var publicity = $('#publicity');
 			text.unbind("change");
+			description.unbind("change");
 			colorPicker.unbind("change");
+			publicity.unbind("change");
 			removeButton.unbind("click");
 
 			details.slideUp(400, function(){
@@ -137,11 +150,19 @@
 					node.text = text.val();
 					updateTreeView();
 				});
+				description.change(function() {
+					dirty_changes = true;
+					node.description = description.val();
+				});
 				colorPicker.bind("change", function() {
 					dirty_changes = true;
 					node.color = colorPicker.value();
 					node.image = colorToImageUrl(node.color);
 					updateTreeView();
+				});
+				publicity.bind("change", function() {
+					dirty_changes = true;
+					node.publicity = publicity.is(':checked');
 				});
 				removeButton.bind("click", function() {
 					dirty_changes = true;
@@ -152,6 +173,8 @@
 
 				text.val(node.text);
 				colorPicker.value(node.color);
+				description.val(node.description);
+				publicity.attr("checked", node.publicity ? "checked" : null);
 				details.slideDown();
 			});
 		}
@@ -165,6 +188,13 @@
 		updateTreeView();
 		$("button").button();
 		$("#text").button().css({
+			'cursor' : 'text',
+			'font' : 'inherit',
+			'outline' : 'none',
+			'text-align' : 'inherit',
+			'background' : 'white'
+		}).unbind('mousedown');
+		$("#description").button().css({
 			'cursor' : 'text',
 			'font' : 'inherit',
 			'outline' : 'none',

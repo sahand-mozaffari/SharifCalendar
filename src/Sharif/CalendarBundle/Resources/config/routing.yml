@@ -26,10 +26,10 @@ sharif_calendar_new_event:
     defaults:
         _controller:    SharifCalendarBundle:Events:new
 
-sharif_calendar_query:
-    pattern:    /user/query/{fromYear}/{fromMonth}/{fromDay}/{toYear}/{toMonth}/{toDay}
+sharif_calendar_query_event:
+    pattern:    /user/query/event/{fromYear}/{fromMonth}/{fromDay}/{toYear}/{toMonth}/{toDay}
     defaults:
-        _controller:    SharifCalendarBundle:Events:getLabels
+        _controller:    SharifCalendarBundle:Events:getEvents
     requirements:
         from-year:  \d+
         from-month: \d+
@@ -37,6 +37,17 @@ sharif_calendar_query:
         to-year:    \d+
         to-month:   \d+
         to-day:     \d+
+
+sharif_calendar_query_label:
+    pattern:    /user/query/label
+    defaults:
+        _controller:    SharifCalendarBundle:Events:getLabels
+
+sharif_calendar_search_labels:
+    pattern:    /user/search_label
+    defaults:
+        _controller:    FrameworkBundle:Template:template
+        template:   'SharifCalendarBundle:EventManagement:searchLabel.html.twig'
 
 sharif_calendar_setting_labels:
     pattern:    /user/setting/labels
@@ -54,7 +65,17 @@ sharif_calendar_signup_successful:
         _controller:    FrameworkBundle:Template:template
         template:   'SharifCalendarBundle:UserManagement:signupSuccessful.html.twig'
 
+sharif_calendar_subscribe_labels:
+    pattern:    /user/subscribe_label
+    defaults:
+        _controller:    SharifCalendarBundle:Events:subscribeLabel
+
 sharif_calendar_submit_labels:
     pattern:    /user/submit/labels
     defaults:
         _controller:    SharifCalendarBundle:UserManagement:submitLabels
+
+sharif_calendar_unsubscribe_labels:
+    pattern:    /user/unsubscribe_label
+    defaults:
+        _controller:    SharifCalendarBundle:Events:unsubscribeLabel

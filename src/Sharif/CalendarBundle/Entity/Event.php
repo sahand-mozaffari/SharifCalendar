@@ -34,17 +34,7 @@ class Event implements \Serializable, \JsonSerializable {
 	protected $id;
 	/**
 	 * @var Label[] Labels associated to this event.
-	 * @ORM\ManyToMany(targetEntity="Label")
-	 * @ORM\JoinTable(name="users_groups",
-	 *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
-	 *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id")}
-	 *      )
-	 * @ORM\JoinTable(name="events_labels",
-	 *      joinColumns={
-	 *          @ORM\JoinColumn(name="event_id", referencedColumnName="id")
-	 *      }, inverseJoinColumns={
-	 *          @ORM\JoinColumn(name="label_id", referencedColumnName="id")}
-	 *      ))
+	 * @ORM\ManyToMany(targetEntity="Label", mappedBy="events")
 	 */
 	protected $labels;
 	/**
@@ -162,6 +152,14 @@ class Event implements \Serializable, \JsonSerializable {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	public function serialize() {
+		return urlencode(serialize(array($this->date, $this->description, $this->id,
+			$this->labels, $this->owner, $this->title)));
+	}
+
+	/**
 	 * Setter method for date field.
 	 * @param AbstractDate $date New value for date field.
 	 * @return $this
@@ -224,16 +222,8 @@ class Event implements \Serializable, \JsonSerializable {
 	/**
 	 * @inheritdoc
 	 */
-	public function serialize() {
-		serialize(array($this->date, $this->description, $this->id,
-			$this->labels, $this->owner, $this->title));
-	}
-
-	/**
-	 * @inheritdoc
-	 */
 	public function unserialize($serialized) {
-		$arr = unserialize($serialized);
+		$arr = unserialize(urldecode($serialized));
 		$this->date = $arr[0];
 		$this->description = $arr[1];
 		$this->id = $arr[2];
@@ -241,6 +231,4 @@ class Event implements \Serializable, \JsonSerializable {
 		$this->owner = $arr[4];
 		$this->title = $arr[5];
 	}
-
-
 }
