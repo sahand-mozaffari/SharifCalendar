@@ -7,9 +7,9 @@ services:
 
 # Forms
     sharif.calendar.date:
-            class: Sharif\CalendarBundle\FormData\Date\DateForm
-            tags:
-                - { name: form.type, alias: date_form }
+        class: Sharif\CalendarBundle\FormData\Date\DateForm
+        tags:
+            - { name: form.type, alias: date_form }
 
     sharif.calendar.date_class:
         class: Sharif\CalendarBundle\FormData\Date\DateClass
@@ -26,10 +26,20 @@ services:
         tags:
             - { name: form.type, alias: nullable_single_date }
 
+    sharif.calendar.nullable_single_date:
+        class: Sharif\CalendarBundle\FormData\Time\NullableTimeRangeForm
+        tags:
+            - { name: form.type, alias: nullable_time_range }
+
     sharif.calendar.single_date:
         class: Sharif\CalendarBundle\FormData\Date\SingleDateForm
         tags:
             - { name: form.type, alias: single_date }
+
+    sharif.calendar.time_range:
+        class: Sharif\CalendarBundle\FormData\Time\TimeRangeForm
+        tags:
+            - { name: form.type, alias: time_range }
 
 # Other
     sharif.calendar.openid_user_manager:

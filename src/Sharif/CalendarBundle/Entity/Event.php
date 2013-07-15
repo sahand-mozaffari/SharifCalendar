@@ -3,6 +3,7 @@ namespace Sharif\CalendarBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Sharif\CalendarBundle\Entity\Date\AbstractDate;
+use Sharif\CalendarBundle\Entity\Time\TimeRange;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -42,6 +43,12 @@ class Event implements \Serializable, \JsonSerializable {
 	 * @ORM\ManyToOne(targetEntity="User")
 	 */
 	protected $owner;
+	/**
+	 * @var TimeRange range of time in which the event is due.
+	 * @ORM\OneToOne(targetEntity="Sharif\CalendarBundle\Entity\Time\TimeRange",
+	 *      orphanRemoval=true, cascade="all")
+	 */
+	protected $timeRange;
 	/**
 	 * @var string Title
 	 * @ORM\Column(type="string", length=200)
@@ -128,6 +135,14 @@ class Event implements \Serializable, \JsonSerializable {
 	}
 
 	/**
+	 * Getter method for this event's time range.
+	 * @return TimeRange timeRange
+	 */
+	public function getTimeRange() {
+		return $this->timeRange;
+	}
+
+	/**
 	 * Getter method for title field.
 	 * @return string Title field.
 	 */
@@ -140,7 +155,8 @@ class Event implements \Serializable, \JsonSerializable {
 	 */
 	public function jsonSerialize() {
 		return array('date' => $this->date, 'description' => $this->description,
-			'label' => $this->labels, 'title' => $this->title);
+			'label' => $this->labels, 'title' => $this->title,
+			'time' => $this->timeRange);
 	}
 
 	/**
@@ -156,7 +172,7 @@ class Event implements \Serializable, \JsonSerializable {
 	 */
 	public function serialize() {
 		return urlencode(serialize(array($this->date, $this->description, $this->id,
-			$this->labels, $this->owner, $this->title)));
+			$this->labels, $this->owner, $this->title, $this->timeRange)));
 	}
 
 	/**
@@ -211,6 +227,16 @@ class Event implements \Serializable, \JsonSerializable {
 	}
 
 	/**
+	 * Setter method for this event's time range.
+	 * @param $timeRange TimeRange New value for time range.
+	 * @return $this
+	 */
+	public function setTimeRange($timeRange) {
+		$this->timeRange = $timeRange;
+		return $timeRange;
+	}
+
+	/**
 	 * Setter method for title field.
 	 * @param string $title New value for title field.
 	 * @return $this
@@ -230,5 +256,6 @@ class Event implements \Serializable, \JsonSerializable {
 		$this->labels = $arr[3];
 		$this->owner = $arr[4];
 		$this->title = $arr[5];
+		$this->timeRange = $arr[6];
 	}
 }

@@ -37,12 +37,9 @@ class EventForm  extends AbstractType {
 			array('data' => json_encode($arr)))->
 			addModelTransformer(new LabelsTransformer()));
 
-		$opts = array();
-		if(isset($options['data'])) {
-			$opts = array_merge($opts,
-				array('data' => $options['data']->getDate()));
-		}
 		$builder->add('date', 'date_form');
+		$builder->add('timeRange', 'nullable_time_range',
+			array('label' => ' '));
 	}
 
 	/**
@@ -57,7 +54,6 @@ class EventForm  extends AbstractType {
 	 */
 	public function setDefaultOptions(OptionsResolverInterface $resolver) {
 		$resolver->setDefaults(array(
-			'data_class' => 'Sharif\CalendarBundle\Entity\Event',
-			'translation_domain' => 'eventForm'));
+			'data_class' => 'Sharif\CalendarBundle\Entity\Event'));
 	}
 }
