@@ -22,8 +22,9 @@
 {% block javascripts %}
 	{{ parent() }}
 	<script>
-		var added_counter = 0
-		var dirty_changes = false;
+		var exit_warning_message =
+				"If you leave the page now, you will lose your unsaved data.";
+		var added_counter = 0;
 
 		function submitClick(e) {
 			function encodeNode(node) {
@@ -64,6 +65,7 @@
 					type: 'success',
 					closeWith: ['hover']
 				});
+				window.onbeforeunload = null;
 				console.log(msg);
 			}).fail(function() {
 				var notif = noty({
@@ -86,7 +88,7 @@
 		}
 
 		function addClick(e) {
-			dirty_changes = true;
+			window.onbeforeunload = function(){return exit_warning_message;}
 			localDataSource.add({
 				id: -++added_counter,
 				text:   "{{ 'new_label'|trans|capitalize }}",
@@ -146,26 +148,26 @@
 
 			details.slideUp(400, function(){
 				text.change(function() {
-					dirty_changes = true;
+					window.onbeforeunload = function(){return exit_warning_message;}
 					node.text = text.val();
 					updateTreeView();
 				});
 				description.change(function() {
-					dirty_changes = true;
+					window.onbeforeunload = function(){return exit_warning_message;}
 					node.description = description.val();
 				});
 				colorPicker.bind("change", function() {
-					dirty_changes = true;
+					window.onbeforeunload = function(){return exit_warning_message;}
 					node.color = colorPicker.value();
 					node.image = colorToImageUrl(node.color);
 					updateTreeView();
 				});
 				publicity.bind("change", function() {
-					dirty_changes = true;
+					window.onbeforeunload = function(){return exit_warning_message;}
 					node.publicity = publicity.is(':checked');
 				});
 				removeButton.bind("click", function() {
-					dirty_changes = true;
+					window.onbeforeunload = function(){return exit_warning_message;}
 					localDataSource.remove(node);
 					details.slideUp();
 					updateTreeView();
