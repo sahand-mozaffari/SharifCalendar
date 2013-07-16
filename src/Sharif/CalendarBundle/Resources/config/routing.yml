@@ -3,6 +3,13 @@ sharif_calendar_homepage:
     defaults:
         _controller:    SharifCalendarBundle:Default:index
 
+sharif_calendar_accept_invitation:
+    pattern:    /user/subscribe_label/{id}
+    defaults:
+        _controller:    SharifCalendarBundle:Events:acceptInvitation
+    requirements:
+        id: \d+
+
 sharif_calendar_add_reminder:
     pattern:    /user/add_reminder
     defaults:
@@ -22,6 +29,11 @@ sharif_calendar_enlist_events:
     pattern:    /user/enlist_event
     defaults:
         _controller:    SharifCalendarBundle:Events:enlistEvents
+
+sharif_calendar_invitation_list:
+    pattern:    /user/invite
+    defaults:
+        _controller:    SharifCalendarBundle:Events:invitationList
 
 sharif_calendar_login:
     pattern:    /login
@@ -68,6 +80,11 @@ sharif_calendar_search_labels:
     defaults:
         _controller:    FrameworkBundle:Template:template
         template:   'SharifCalendarBundle:EventManagement:searchLabel.html.twig'
+
+sharif_calendar_send_invitations:
+    pattern:    /user/setting/labels
+    defaults:
+        _controller:    SharifCalendarBundle:Events:sendInvitations
 
 sharif_calendar_setting_labels:
     pattern:    /user/setting/labels

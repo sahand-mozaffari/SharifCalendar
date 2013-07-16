@@ -10,9 +10,27 @@ use Sharif\CalendarBundle\FormData\EventForm;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Constraints\Locale;
 
 class EventsController extends Controller {
+	public function acceptInvitationAction($id) {
+		$user = $this->getUser();
+		$em = $this->getDoctrine()->getManager();
+		$repository = $this->getDoctrine()->getRepository('SharifCalendarBundle:Label');
+		$label = $repository->findOneById($id);
+
+		if(in_array($label, $user->getSubscribedLabels()->toArray(), true)) {
+			return new Response('You are already subscribed.', 403);
+		} elseif(in_array($label, $user->getLabels()->toArray(), true)) {
+			return new Response('You are already own the label.', 403);
+		} else {
+			$user->addSubscribedLabel($label);
+			$em = $this->getDoctrine()->getManager();
+			$em->persist($user);
+			$em->flush();
+			return new Response('You subscribed to this label successfully.');
+		}
+	}
+
 	public function addReminderAction() {
 		$id = $this->getRequest()->getContent();
 		$user = $this->getUser();
@@ -170,6 +188,25 @@ class EventsController extends Controller {
 		return new JsonResponse($result);
 	}
 
+	public function invitationListAction() {
+		$labels = $this->getUser()->getLabels();
+
+		$tops = array();
+		foreach($labels as $label) {
+			if($label->getParent() == null) {
+				$tops[] = $label;
+			}
+		}
+		$result = array();
+		foreach($tops as $top) {
+			$result[] = UserManagementController::encodeNode($top);
+		}
+
+		return $this->render(
+			'SharifCalendarBundle:EventManagement:invitation.html.twig',
+			array('labels' => json_encode($result)));
+	}
+
 	public function newAction() {
 		$user = $this->getUser();
 		$em = $this->getDoctrine()->getManager();
@@ -238,6 +275,46 @@ class EventsController extends Controller {
 			array('labels' => json_encode($result)));
 	}
 
+	public function sendInvitationsAction() {
+		$template = "<html>
+				<body>
+					__USER_NAME__ has invited you to '__LABEL_NAME__: __LABEL_DESCRIPTION__'. If you are interested to join him/her, click <a href='__LINK__'>here</a> to be redirected to SharifCalendar's website. By logging in, you can subscribe to this event.
+				<br/>
+				Regards,
+				<br>
+				Bagher and Sahand.
+				</body>
+			</html>";
+
+		$content = $this->getRequest()->getContent();
+		$data = json_decode($content);
+		$id = $data->id;
+		$emails = explode(' ', $data->emails);
+		$repository =
+			$this->getDoctrine()->getRepository('SharifCalendarBundle:Label');
+		$label = $repository->findOneById($id);
+
+		$body = str_replace('__USER_NAME__',
+			$this->getUser()->getName(), $template);
+		$body = str_replace('__LABEL_NAME__', $label->getName(), $body);
+		$body = str_replace('__LABEL_DESCRIPTION__',
+			$label->getDescription(), $body);
+		$body = str_replace('__LINK__', $this->getRequest()->getHost()
+			.$this->generateUrl('sharif_calendar_accept_invitation',
+				array('id' => $label->getId())), $body);
+
+		$message = \Swift_Message::newInstance();
+		$message->setBcc($emails);
+		$message->setBody($body, 'text/html');
+		$message->setFrom('noreply@sharif-calendar.com');
+		$message->setReadReceiptTo('noreply@sharif-calendar.com');
+		$message->setReturnPath('noreply@sharif-calendar.com');
+		$message->setSender('noreply@sharif-calendar.com');
+		$message->setSubject('SharifCalendar invitation');
+		$this->get('mailer')->send($message);
+		return new Response();
+	}
+
 	public function subscribeLabelAction() {
 		$user = $this->getUser();
 		$id = intval($this->getRequest()->getContent());
@@ -252,7 +329,6 @@ class EventsController extends Controller {
 		} else {
 			$user->addSubscribedLabel($label);
 			$em = $this->getDoctrine()->getManager();
-			$em->persist($label);
 			$em->persist($user);
 			$em->flush();
 			return new Response('You subscribed to this label successfully.');
