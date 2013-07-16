@@ -3,6 +3,11 @@ sharif_calendar_homepage:
     defaults:
         _controller:    SharifCalendarBundle:Default:index
 
+sharif_calendar_add_reminder:
+    pattern:    /user/add_reminder
+    defaults:
+        _controller:    SharifCalendarBundle:Events:addReminder
+
 sharif_calendar_calendar:
     pattern:    /user/calendar
     defaults:
@@ -12,6 +17,11 @@ sharif_calendar_edit_event:
     pattern:    /user/edit-event/{id}
     defaults:
         _controller:    SharifCalendarBundle:Events:editEvent
+
+sharif_calendar_enlist_events:
+    pattern:    /user/enlist_event
+    defaults:
+        _controller:    SharifCalendarBundle:Events:enlistEvents
 
 sharif_calendar_login:
     pattern:    /login
@@ -42,6 +52,16 @@ sharif_calendar_query_label:
     pattern:    /user/query/label
     defaults:
         _controller:    SharifCalendarBundle:Events:getLabels
+
+sharif_calendar_remove_reminder:
+    pattern:    /user/remove_reminder
+    defaults:
+        _controller:    SharifCalendarBundle:Events:removeReminder
+
+sharif_calendar_search_events:
+    pattern:    /user/search_event
+    defaults:
+        _controller:    SharifCalendarBundle:Events:searchEvents
 
 sharif_calendar_search_labels:
     pattern:    /user/search_label
@@ -79,3 +99,9 @@ sharif_calendar_unsubscribe_labels:
     pattern:    /user/unsubscribe_label
     defaults:
         _controller:    SharifCalendarBundle:Events:unsubscribeLabel
+
+sharif_calendar_mailer:
+    pattern:    /mail
+    host: "localhost"
+    defaults:
+        _controller:    SharifCalendarBundle:Default:sendMail

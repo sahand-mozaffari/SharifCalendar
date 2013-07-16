@@ -68,7 +68,8 @@ class TimeRange implements \JsonSerializable {
 	 * @inheritdoc
 	 */
 	public function jsonSerialize() {
-		return array('start' => $this->startTime, 'end' => $this->endTime);
+		return array('start' => $this->startTime, 'end' => $this->endTime,
+			'string' => $this->toString());
 	}
 
 	/**
@@ -99,5 +100,14 @@ class TimeRange implements \JsonSerializable {
 	public function setStartTime(\DateTime $startTime) {
 		$this->startTime = $startTime;
 		return $this;
+	}
+
+	/**
+	 * Determines the string representation of this time range.
+	 * @return string String representation of this time range.
+	 */
+	public function toString() {
+		return
+			$this->startTime->format('H:i').'-'.$this->endTime->format('H:i');
 	}
 }

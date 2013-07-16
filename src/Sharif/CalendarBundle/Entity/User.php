@@ -57,6 +57,19 @@ class User implements UserInterface, \Serializable {
 	 */
 	protected $password;
 	/**
+	 * @var Event[] Events that this user has marked to be reminded of,
+	 * through email.
+	 * @ORM\ManyToMany(targetEntity="Event")
+	 * @ORM\JoinTable(name="users_reminderEvents", joinColumns={
+	 *          @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+	 *      },
+	 *      inverseJoinColumns={
+	 *          @ORM\JoinColumn(name="reminder_id", referencedColumnName="id")
+ *          }
+	 * )
+	 */
+	protected $reminders;
+	/**
 	 * @var string The string used to salt the password before hashing.
 	 * @ORM\Column(type="string", length=20, nullable=true)
 	 */
@@ -79,6 +92,7 @@ class User implements UserInterface, \Serializable {
 	public function __construct($name, $email, $username=null, $password=null) {
 		$this->openIds = new ArrayCollection();
 		$this->labels = new ArrayCollection();
+		$this->reminders = new ArrayCollection();
 		$this->subscribedLabels = new ArrayCollection();
 		$this->setName($name);
 		$this->setEmail($email);
@@ -113,6 +127,18 @@ class User implements UserInterface, \Serializable {
 	 */
 	public function addOpenId(OpenIdIdentity $openIds) {
 		$this->openIds[] = $openIds;
+		return $this;
+	}
+
+	/**
+	 * Add reminders.
+	 * @param Event $reminder Event to be added to reminders list.
+	 * @return User $this.
+	 */
+	public function addReminder(Event $reminder) {
+		if(!$this->reminders->contains($reminder)) {
+			$this->reminders[] = $reminder;
+		}
 		return $this;
 	}
 
@@ -207,6 +233,14 @@ class User implements UserInterface, \Serializable {
 	}
 
 	/**
+	 * Getter method for this user's reminder list.
+	 * @return string This user's reminder list.
+	 */
+	public function getReminders() {
+		return $this->reminders;
+	}
+
+	/**
 	 * Returns the roles granted to the user.
 	 *
 	 * <code>
@@ -284,6 +318,14 @@ class User implements UserInterface, \Serializable {
 	}
 
 	/**
+	 * Remove reminder
+	 * @param Event $reminder Event to be removed from reminders.
+	 */
+	public function removeReminder(Event $reminder) {
+		$this->reminders->removeElement($reminder);
+	}
+
+	/**
 	 * Remove labels from list of subscribed.
 	 * @param Label $labels Label to be removed.
 	 */
@@ -294,7 +336,8 @@ class User implements UserInterface, \Serializable {
 	public function serialize() {
 		return urlencode(serialize(array($this->id, $this->name, $this->openIds,
 			$this->password, $this->salt, $this->username, $this->email,
-			$this->labels, $this->events, $this->subscribedLabels)));
+			$this->labels, $this->events, $this->subscribedLabels,
+			$this->reminders)));
 	}
 
 	/**
@@ -391,5 +434,6 @@ class User implements UserInterface, \Serializable {
 		$this->labels = $arr[7];
 		$this->events = $arr[8];
 		$this->subscribedLabels = $arr[9];
+		$this->reminders = $arr[10];
 	}
 }

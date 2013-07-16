@@ -18,7 +18,7 @@ class UserManagementController extends Controller {
 	 * @param null $parent Label For internal use.
 	 * @return array Array of labels decoded from form data.
 	 */
-	private function decodeNodes($nodes, $parent=null) {
+	public static function decodeNodes($nodes, $parent=null) {
 		$result = array();
 		foreach($nodes as $node) {
 			$newLabel = (new Label(null, $node['name'],
@@ -31,7 +31,7 @@ class UserManagementController extends Controller {
 			$result[] = $newLabel;
 			if(isset($node['items'])) {
 				$result = array_merge($result,
-					$this->decodeNodes($node['items'], $newLabel));
+					self::decodeNodes($node['items'], $newLabel));
 			}
 		}
 		return $result;
@@ -42,7 +42,7 @@ class UserManagementController extends Controller {
 	 * @return array Array containing labels owned by current user, linked as
 	 *      in a tree, and consumable by a KendoUI TreeView.
 	 */
-	private function encodeNode($node) {
+	public static function encodeNode($node) {
 		$result = array('id' => $node->getId(), 'text' => $node->getName(),
 			'color' => sprintf("#%6X", $node->getColor()), 'image' => "",
 			'description' => $node->getDescription(),
@@ -50,7 +50,7 @@ class UserManagementController extends Controller {
 		if(!$node->getChildren()->isEmpty()) {
 			$children = array();
 			foreach($node->getChildren() as $child) {
-				$children[] = $this->encodeNode($child);
+				$children[] = self::encodeNode($child);
 			}
 			$result['items'] = $children;
 		}
@@ -118,7 +118,7 @@ class UserManagementController extends Controller {
 		}
 		$result = array();
 		foreach($tops as $top) {
-			$result[] = $this->encodeNode($top);
+			$result[] = self::encodeNode($top);
 		}
 
 		return $this->render(
@@ -161,7 +161,7 @@ class UserManagementController extends Controller {
 		if(!empty($content)) {
 			$content = json_decode($content, true);
 		}
-		$labels = $this->decodeNodes($content);
+		$labels = self::decodeNodes($content);
 		$index = array();
 		$dbIndex = array();
 

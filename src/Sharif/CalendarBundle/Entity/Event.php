@@ -35,7 +35,7 @@ class Event implements \Serializable, \JsonSerializable {
 	protected $id;
 	/**
 	 * @var Label[] Labels associated to this event.
-	 * @ORM\ManyToMany(targetEntity="Label", mappedBy="events")
+	 * @ORM\ManyToMany(targetEntity="Label", mappedBy="events", cascade="all")
 	 */
 	protected $labels;
 	/**
@@ -155,8 +155,8 @@ class Event implements \Serializable, \JsonSerializable {
 	 */
 	public function jsonSerialize() {
 		return array('date' => $this->date, 'description' => $this->description,
-			'label' => $this->labels, 'title' => $this->title,
-			'time' => $this->timeRange);
+			'label' => $this->labels->toArray(), 'title' => $this->title,
+			'time' => $this->timeRange, 'id' => $this->id);
 	}
 
 	/**
@@ -212,7 +212,10 @@ class Event implements \Serializable, \JsonSerializable {
 	 * @return $this
 	 */
 	public function setLabels($labels) {
-		$this->labels = $labels;
+		$this->labels->clear();
+		foreach($labels as $label) {
+			$this->labels->add($label);
+		}
 		return $this;
 	}
 

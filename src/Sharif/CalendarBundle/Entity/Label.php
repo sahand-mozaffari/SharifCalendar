@@ -99,7 +99,7 @@ class Label implements \Serializable, \JsonSerializable {
 	 * @return Label $this.
 	 */
 	public function addEvent(Event $event) {
-		$this->event[] = $event;
+		$this->events[] = $event;
 		return $this;
 	}
 
@@ -214,7 +214,7 @@ class Label implements \Serializable, \JsonSerializable {
 	 * Remove event
 	 * @param Event $event Event to be removed.
 	 */
-	public function removeEvent(Label $event) {
+	public function removeEvent(Event $event) {
 		$this->events->removeElement($event);
 	}
 

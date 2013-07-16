@@ -10,31 +10,20 @@ use Sharif\CalendarBundle\FormData\EventForm;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Constraints\Locale;
 
 class EventsController extends Controller {
-	private function copyDate($date) {
-		switch(substr(get_class($date), strripos(get_class($date), '\\') + 1)) {
-			case 'SingleDate' :
-			return new SingleDate($date->getYear(), $date->getMonth(),
-				$date->getDay(), $date->getType());
-			case 'AnnualDate' :
-				return new AnnualDate($this->copyDate($date->getBase()),
-					$this->copyDate($date->getStart()),
-					$this->copyDate($date->getEnd()),
-					$date->getStep());
-			case 'MonthlyDate' :
-				return new MonthlyDate($this->copyDate($date->getBase()),
-					$this->copyDate($date->getStart()),
-					$this->copyDate($date->getEnd()),
-					$date->getStep());
-			case 'DailyDate' :
-				return new DailyDate($this->copyDate($date->getBase()),
-					$this->copyDate($date->getStart()),
-					$this->copyDate($date->getEnd()),
-					$date->getStep());
-			default:
-				return null;
-		}
+	public function addReminderAction() {
+		$id = $this->getRequest()->getContent();
+		$user = $this->getUser();
+		$em = $this->getDoctrine()->getManager();
+		$repository = $this->getDoctrine()
+			->getRepository('SharifCalendarBundle:Event');
+		$event = $repository->findOneById($id);
+		$user->addReminder($event);
+		$em->persist($user);
+		$em->flush();
+		return new Response();
 	}
 
 	public function editEventAction($id) {
@@ -58,10 +47,12 @@ class EventsController extends Controller {
 				$oldEvent->setDescription($newEvent->getDescription());
 				foreach($oldEvent->getLabels() as $oldLabel) {
 					$oldLabel->removeEvent($oldEvent);
+					$em->persist($oldLabel);
 				}
-				$oldEvent->setLabels($newEvent->getLabels());
+				$oldEvent->setLabels(clone $newEvent->getLabels());
 				foreach($newEvent->getLabels() as $newLabel) {
 					$newLabel->addEvent($oldEvent);
+					$em->persist($newLabel);
 				}
 				$em->persist($oldEvent->getDate());
 				$em->persist($oldEvent);
@@ -82,6 +73,45 @@ class EventsController extends Controller {
 		return $this ->render(
 			'SharifCalendarBundle:EventManagement:newEvent.html.twig',
 			array('form' => $form->createView(), 'data' => json_encode($data)));
+	}
+
+	public function enlistEventsAction() {
+		$content = $this->getRequest()->getContent();
+		$data = json_decode($content);
+		$tokens = preg_split('/[\s+,]/', $data->term);
+		$checkedLabels = $data->checkedLabels;
+		$user = $this->getUser();
+
+		$result = array();
+		foreach($user->getAllEvents() as $event) {
+			foreach($tokens as $token) {
+				if(stripos($event->getTitle(), $token) === FALSE &&
+					stripos($event->getDescription(), $token) === FALSE &&
+					stripos($event->getOwner()->getName(), $token) === FALSE) {
+					continue 2;
+				}
+			}
+
+			if(count($checkedLabels) === 0) {
+				$result[] = array_merge($event->jsonSerialize(),
+					array('hasReminder' =>
+					in_array($event, $user->getReminders()->toArray(), true)));
+				continue 1;
+			}
+
+			foreach($checkedLabels as $id) {
+				foreach($event->getLabels() as $label) {
+					if($label->getId() === $id) {
+						$result[] = array_merge($event->jsonSerialize(),
+							array('hasReminder' =>
+							in_array($event, $user->getReminders()->toArray(), true)));
+						continue 3;
+					}
+				}
+			}
+		}
+
+		return new JsonResponse($result);
 	}
 
 	public function getEventsAction($fromYear, $fromMonth, $fromDay, $toYear,
@@ -176,6 +206,38 @@ class EventsController extends Controller {
 			array('form' => $form->createView(), 'data' => json_encode($data)));
 	}
 
+	public function removeReminderAction() {
+		$id = $this->getRequest()->getContent();
+		$user = $this->getUser();
+		$em = $this->getDoctrine()->getManager();
+		$repository = $this->getDoctrine()
+			->getRepository('SharifCalendarBundle:Event');
+		$event = $repository->findOneById($id);
+		$user->removeReminder($event);
+		$em->persist($user);
+		$em->flush();
+		return new Response();
+	}
+
+	public function searchEventsAction() {
+		$labels = $this->getUser()->getLabels();
+
+		$tops = array();
+		foreach($labels as $label) {
+			if($label->getParent() == null) {
+				$tops[] = $label;
+			}
+		}
+		$result = array();
+		foreach($tops as $top) {
+			$result[] = UserManagementController::encodeNode($top);
+		}
+
+		return $this->render(
+			'SharifCalendarBundle:EventManagement:searchEvent.html.twig',
+			array('labels' => json_encode($result)));
+	}
+
 	public function subscribeLabelAction() {
 		$user = $this->getUser();
 		$id = intval($this->getRequest()->getContent());
@@ -217,6 +279,31 @@ class EventsController extends Controller {
 				'You own the label. If you wish to dismiss this label, use the remove option in label settings page.', 403);
 		} else {
 			return new Response('You are not subscribed to this label', 403);
+		}
+	}
+
+	private function copyDate($date) {
+		switch(substr(get_class($date), strripos(get_class($date), '\\') + 1)) {
+			case 'SingleDate' :
+				return new SingleDate($date->getYear(), $date->getMonth(),
+					$date->getDay(), $date->getType());
+			case 'AnnualDate' :
+				return new AnnualDate($this->copyDate($date->getBase()),
+					$this->copyDate($date->getStart()),
+					$this->copyDate($date->getEnd()),
+					$date->getStep());
+			case 'MonthlyDate' :
+				return new MonthlyDate($this->copyDate($date->getBase()),
+					$this->copyDate($date->getStart()),
+					$this->copyDate($date->getEnd()),
+					$date->getStep());
+			case 'DailyDate' :
+				return new DailyDate($this->copyDate($date->getBase()),
+					$this->copyDate($date->getStart()),
+					$this->copyDate($date->getEnd()),
+					$date->getStep());
+			default:
+				return null;
 		}
 	}
 }

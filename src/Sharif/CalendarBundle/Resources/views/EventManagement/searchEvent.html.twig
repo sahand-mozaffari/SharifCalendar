@@ -1,0 +1,272 @@
+{% extends "SharifCalendarBundle::baseHtml.html.twig" %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>
+		.event-box {
+			border-color: orange;
+			border-radius: 10px;
+			border-style: solid;
+			border-width: 1px;
+			padding: 5px;
+			width: 600px;
+			margin: 5px;
+		}
+
+		.event-controls img {
+			background-color: #EEEEEE;
+			border-radius: 10px;
+			cursor: pointer;
+			float: right;
+			padding: 2px;
+		}
+
+		.event-controls img:hover {
+			background-color: #CCCCCC;
+		}
+
+		.event-date-time img {
+			font-size: x-small;
+			color: grey;
+		}
+
+		.label {
+			border-radius: 10px;
+			margin: 0 2px 11px 2px;
+			padding: 2px 7px 2px 7px;
+		}
+	</style>
+{% endblock stylesheets %}
+
+{% block body %}
+	<input type="search" id="search">
+	<div id="tree-container"><div id="tree-view"></div></div>
+	<div id="result-container"></div>
+{% endblock body %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		var selectedEventId = -1;
+		var localDataSource = new kendo.data.HierarchicalDataSource({
+			data: {{ labels|raw }}
+		});
+
+		$(document).ready(function() {
+			var search = $("#search");
+			var tree_view = $('#tree-view');
+			search.button().css({
+				'background' : 'white',
+				'cursor' : 'text',
+				'font' : 'inherit',
+				'outline' : 'none',
+				'text-align' : 'inherit'
+			}).unbind('mousedown');
+			tree_view.kendoTreeView({
+				checkboxes:         true,
+				dataImageUrlField:  "image",
+				dataSource:         localDataSource,
+				dataTextField:      "text",
+				loadOnDemand:       false
+			});
+			search.change(reload);
+			nodes = $("#tree-view li");
+			for(i = 0; i < nodes.length; ++i) {
+				var uid = nodes[i].getAttribute("data-uid");
+				var node = localDataSource.getByUid(uid);
+				node.image = colorToImageUrl(node.color);
+			}
+			updateTreeView();
+		});
+	</script>
+
+	<script>
+		function addReminder(id) {
+			$.ajax({
+				url:    '{{ path('sharif_calendar_add_reminder') }}',
+				data:   id.toString(),
+				method: 'POST'
+			}).done(function(msg) {
+				var img = $('#img-'+id);
+				img.unbind('click');
+				img.click(function(e) {
+					removeReminder(id);
+				});
+				img.attr('src', '{{ app.request.getSchemeAndHttpHost()}}{{ '/src/Sharif/CalendarBundle/Resources/public/images/reminder-not.png' }}');
+			}).fail(function(msg) {
+				noty({
+					text: 'Failed to add reminder. Check your connection and try again.',
+					layout: 'topRight',
+					type: 'warning',
+					closeWith: ['hover']
+				});
+			});
+		}
+
+		function bindClickAdd(id) {
+			$('#img-'+id).click(function() {
+				addReminder(id);
+			});
+		}
+
+		function bindClickRemove(id) {
+			$('#img-'+id).click(function() {
+				removeReminder(id);
+			});
+		}
+
+		function checkedNodes(data) {
+			var result = [];
+			for(i = 0; i < data.length; ++i) {
+				if(data[i].checked) {
+					result.push(data[i].id);
+				}
+				if(data[i].hasChildren) {
+					var temp = checkedNodes(data[i].children._data);
+					for(j = 0; j < temp.length; ++j) {
+						result.push(temp[j]);
+					}
+				}
+			}
+			return result;
+		}
+
+		function colorToImageUrl(color) {
+			// Create an empty canvas element
+			var canvas = document.createElement("canvas");
+			canvas.width = 15;
+			canvas.height = 15;
+
+			// Draw a circle
+			var ctx = canvas.getContext("2d");
+			ctx.beginPath();
+			ctx.arc(7, 7, 7, 0, Math.PI*2, true);
+			ctx.closePath();
+			ctx.fillStyle=color;
+			ctx.fill();
+
+			// Get the data-URL formatted image
+			return canvas.toDataURL("image/png");
+		}
+
+		function reload() {
+			console.log(JSON.stringify({
+				term:           $('#search').val(),
+				checkedLabels:  checkedNodes(localDataSource._data)
+			}));
+			$.ajax({
+				data:   JSON.stringify({
+					term:           $('#search').val(),
+					checkedLabels:  checkedNodes(localDataSource._data)
+				}),
+				method: "POST",
+				url:    "{{ path('sharif_calendar_enlist_events') }}"
+			}).done(function(msg) {
+				console.log(msg);
+				var result_container = $('#result-container');
+				var html = "";
+				for(i = 0; i < msg.length; ++i) {
+					var event = msg[i];
+					var box =
+						("<div class='event-box' id='event-__ID__' eventId='__ID__'>" +
+						"   <div class='event-controls'>" +
+						"       <img class='reminder-button control-button' id='img-__ID__' src='{{ app.request.getSchemeAndHttpHost()}}{{ '/src/Sharif/CalendarBundle/Resources/public/images/__REMIND__' }}' />" +
+						"   </div>" +
+						"   <div class='event-title'>" +
+						"       <h4>__TITLE__</h4>" +
+						"   </div>" +
+						"   <div class='event-description'>__DESCRIPTION__</div>" +
+						"   <hr/>" +
+						"   <div class='labels-box'>__LABELS__</div>" +
+						"   <div class='event-date-time'>" +
+						"       <span class='event-date'>__DATE__</span>" +
+						"       <span class='event-time'>__TIME__</span>" +
+						"   </div>" +
+						"</div>")
+						.replace(/__TITLE__/g, event['title'])
+						.replace(/__ID__/g, event['id'])
+						.replace(/__DESCRIPTION__/g, event['description'])
+						.replace(/__DATE__/g, event['date']['string'])
+						.replace(/__REMIND__/g, event['hasReminder'] ?
+							'reminder-not.png' : 'reminder.png')
+						.replace(/__TIME__/g, (event['time'] != null) ?
+							event['time']['string'] : '');
+					var labels = "";
+					for(j = 0; j < event['label'].length; ++j) {
+						labels +=
+							"<span class='label' style='background-color: __COLOR__;' title='__DESCRIPTION__'>__NAME__</span>"
+							.replace(/__COLOR__/g,
+								'#' + event['label'][j]['color'].toString(16))
+							.replace(/__NAME__/g, event['label'][j]['name'])
+							.replace(/__DESCRIPTION__/g,
+								event['label'][j]['description']);
+					}
+					box = box.replace(/__LABELS__/g, labels);
+					html += box;
+				}
+				result_container.slideUp(function() {
+					result_container.html(html);
+					for(i = 0; i < msg.length; ++i) {
+						if(msg[i]['hasReminder']) {
+							bindClickRemove(msg[i]['id']);
+						} else {
+							bindClickAdd(msg[i]['id']);
+						}
+					}
+					result_container.slideDown();
+				});
+			}).fail(function(msg) {
+				noty({
+					text: 'Failed to carry out your request. Try again?',
+					layout: 'topRight',
+					type: 'error',
+					closeWith: ['button'],
+					buttons: [ {
+						addClass: 'btn btn-primary', text: 'Retry', onClick: function($noty) {
+							$noty.close();
+							reload();
+						}
+					}, {
+						addClass: 'btn btn-danger', text: 'Dismiss', onClick: function($noty) {
+							$noty.close();
+						}
+					}]
+				});
+			});
+		}
+
+		function removeReminder(id) {
+			$.ajax({
+				url:    '{{ path('sharif_calendar_remove_reminder') }}',
+				data:   id.toString(),
+				method: 'POST'
+			}).done(function() {
+				var img = $('#img-'+id);
+				img.unbind('click');
+				img.click(function(e) {
+					addReminder(id);
+				});
+				img.attr('src', '{{ app.request.getSchemeAndHttpHost()}}{{ '/src/Sharif/CalendarBundle/Resources/public/images/reminder.png' }}');
+			}).fail(function() {
+				noty({
+					text: 'Failed to remove reminder. Check your connection and try again.',
+					layout: 'topRight',
+					type: 'warning',
+					closeWith: ['hover']
+				});
+			});
+		}
+
+		function updateTreeView() {
+			$("#tree-container").html(
+					"<div class=\"treeView\" id=\"tree-view\"></div>");
+			$("#tree-view").kendoTreeView({
+				checkboxes:         true,
+				dataImageUrlField:  "image",
+				dataSource:         localDataSource,
+				dataTextField:      "text",
+				loadOnDemand:       false
+			});
+		}
+	</script>
+{% endblock javascripts %}

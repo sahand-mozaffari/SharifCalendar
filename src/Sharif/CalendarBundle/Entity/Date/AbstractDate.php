@@ -50,7 +50,7 @@ abstract class AbstractDate implements \JsonSerializable {
 	 * @inheritdoc
 	 */
 	public function jsonSerialize() {
-		return array('type' => $this->type);
+		return array('type' => $this->type, 'string' => $this->toString());
 	}
 
 	/**
@@ -79,4 +79,10 @@ abstract class AbstractDate implements \JsonSerializable {
 	 * @return boolean Whether or not a given single date matches this date.
 	 */
 	public abstract function matches(SingleDate $date);
+
+	/**
+	 * Determines the string representation of this date.
+	 * @return string String representation of this date.
+	 */
+	public abstract function toString();
 }
