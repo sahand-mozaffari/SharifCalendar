@@ -1,6 +1,5 @@
 <?php
 namespace Sharif\CalendarBundle\Entity\Date;
-use \Date;
 use \jCalendar;
 use \Hijri_GregorianConvert;
 use doctrine\Orm\Mapping as ORM;
@@ -253,6 +252,13 @@ class SingleDate extends AbstractDate {
 		$date =  new \DateTime();
 		return $date->setDate($gregorian->year, $gregorian->month,
 				$gregorian->day);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function toString() {
+		return $this->year.'/'.$this->month.'/'.$this->day.' '.$this->type;
 	}
 
 	/**

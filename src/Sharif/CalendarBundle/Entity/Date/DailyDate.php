@@ -33,4 +33,17 @@ class DailyDate extends RecurringDate {
 			$this->getBase()->toDate()->diff($that->toDate())->format("%d")) %
 			$this->getStep() == 0;
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function toString() {
+		if($this->step % 7 === 0) {
+			$step = $this->step > 7 ? ($this->step / 7).' ' : '';
+			return 'Every '.$step.' week from '.$this->base->toString();
+		} else {
+			$step = $this->step > 1 ? $this->step.' ' : '';
+			return 'Every '.$step.' day from '.$this->base->toString();
+		}
+	}
 }

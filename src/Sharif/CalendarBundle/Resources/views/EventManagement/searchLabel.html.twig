@@ -1,0 +1,167 @@
+{% extends "SharifCalendarBundle::baseHtml.html.twig" %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>
+		.label {
+			border-color: orange;
+			border-radius: 5px;
+			border-style: solid;
+			border-width:  1px;
+			margin: 5px;
+			padding: 15px;
+			width: 300px;
+		}
+
+		.label:hover {
+			border-color: #ab6000;
+		}
+
+		.label-button {
+			float: right;
+		}
+
+		.label-button:hover {
+			cursor: pointer;
+		}
+
+		.label-name {
+			font-size: xx-large;
+			font-weight: bold;
+		}
+
+		.label-owner {
+			color:  gray;
+			font-size: x-small;
+			margin-top: 5px;
+			margin-left: 20px;
+		}
+	</style>
+{% endblock stylesheets %}
+
+{% block body %}
+	<input type="search" id="search" />
+	<div id="result-container"></div>
+{% endblock body %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		var input = $('#search');
+		var result_box = $('#result-container');
+
+		function search(e) {
+			console.log('hello');
+			var search_term = input.val();
+			if(search_term.match(/([-\s,_،+]*[^\-\s,_،+]+[-\s,_،+]*)+/)) {
+				$.ajax({
+					data: search_term.trim(),
+					type: "POST",
+					cache: false,
+					url: "{{ app.request.getSchemeAndHttpHost() }}{{ path(
+				         'sharif_calendar_query_label') }}"
+				}).done(function(result) {
+					var html = "";
+					for(i = 0; i < result.length; ++i) {
+						html += "<div class='label'><img class='label-button __IMG_CLASS__' src='__IMG__' uid='__ID__' /><div class='label-name' style='color: __COLOR__;'>__NAME__</div><div class='label-description'>__DESCRIPTION__</div><div class='label-owner'>By __OWNER__</div></div>".
+								replace(/__COLOR__/g, '#'+result[i]['color'].toString(16)).
+								replace(/__NAME__/g, result[i]['name']).
+								replace(/__DESCRIPTION__/g, result[i]['description']).
+								replace(/__OWNER__/g, result[i]['owner_name']).
+								replace(/__ID__/g, result[i]['id']).
+								replace(/__IMG_CLASS__/g, result[i]['am_subscribed'] ? 'subscribed' : 'unsubscribed').
+								replace(/__IMG__/g, '{{ app.request.getSchemeAndHttpHost() }}'+
+				         '/src/Sharif/CalendarBundle/Resources/public/images/' + (result[i]['am_subscribed'] ? 'remove.png' : 'add.png'));
+					}
+					result_box.html(html);
+
+					$('.subscribed').click(unsubscribe);
+					$('.unsubscribed').click(subscribe);
+				}).fail(function() {
+					var notif = noty({
+						text: 'Failed to carry out your request. Please try again.',
+						layout: 'topRight',
+						type: 'warning',
+						closeWith: ['hover']
+					});
+				});
+			}
+		}
+
+		function subscribe(e) {
+			var target = e.target;
+			var id = target.getAttribute('uid');
+			$.ajax({
+				url:    "{{ path('sharif_calendar_subscribe_labels') }}",
+				type:   "POST",
+				cache:  false,
+				data:   id
+			}).done(function(msg) {
+
+				noty({
+					text: msg,
+					layout: 'topRight',
+					type: 'success',
+					closeWith: ['hover']
+				});
+				target = $(target);
+				target.unbind('click');
+				target.click(unsubscribe);
+				target.removeClass('unsubscribed');
+				target.addClass('subscribed');
+				target.attr('src', '{{ app.request.getSchemeAndHttpHost() }}'+
+						'/src/Sharif/CalendarBundle/Resources/public/images/remove.png');
+			}).fail(function(msg) {
+				noty({
+					text: msg == "" ? "Unknown error" : msg,
+					layout: 'topRight',
+					type: 'warning',
+					closeWith: ['hover']
+				});
+			});
+		}
+
+		function unsubscribe(e) {
+			var target = e.target;
+			var id = target.getAttribute('uid');
+			$.ajax({
+				url:    "{{ path('sharif_calendar_unsubscribe_labels') }}",
+				type:   "POST",
+				cache:  false,
+				data:   id
+			}).done(function(msg) {
+				noty({
+					text: msg,
+					layout: 'topRight',
+					type: 'success',
+					closeWith: ['hover']
+				});
+				target = $(target);
+				target.unbind('click');
+				target.click(subscribe);
+				target.removeClass('subscribed');
+				target.addClass('unsubscribed');
+				target.attr('src', '{{ app.request.getSchemeAndHttpHost() }}'+
+						'/src/Sharif/CalendarBundle/Resources/public/images/add.png');
+			}).fail(function(msg) {
+				noty({
+					text: msg == "" ? "Unknown error" : msg,
+					layout: 'topRight',
+					type: 'warning',
+					closeWith: ['hover']
+				});
+			});
+		}
+	</script>
+
+	<script>
+		input.change(search);
+		input.button().css({
+			'cursor' : 'text',
+			'font' : 'inherit',
+			'outline' : 'none',
+			'text-align' : 'inherit',
+			'background' : 'white'
+		}).unbind('mousedown');
+	</script>
+{% endblock javascripts %}

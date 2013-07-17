@@ -34,4 +34,12 @@ class AnnualDate extends RecurringDate {
 			($this->getBase()->getYear() - $that->getYear()) %
 				$this->getStep() == 0;
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function toString() {
+		$step = $this->step > 1 ? $this->step.' ' : '';
+		return 'Every '.$step.' year from '.$this->base->toString();
+	}
 }

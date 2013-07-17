@@ -1,5 +1,17 @@
 {% extends "SharifCalendarBundle::baseHtml.html.twig" %}
 
+{% block stylesheets %}
+	<style>
+		.cute-icon {
+			cursor: pointer;
+			height: 50px;
+		}
+		.cute-button {
+			display: inline-block;
+		}
+	</style>
+{% endblock stylesheets %}
+
 {% block body %}
 	{# logout option #}
 	<div>
@@ -47,6 +59,15 @@
 		<form id="fp_openid_login"
 				action="{{ path("fp_openid_security_check") }}"
 				method="post">
+			<div id="cute-button-container">
+				<div id="yahoo-cute-button" class="cute-button">
+					<img class="cute-icon" src="{{ app.request.getSchemeAndHttpHost() }}{{ '/src/Sharif/CalendarBundle/Resources/public/images/yahoo-logo.png' }}">
+				</div>
+				<div id="google-cute-button" class="cute-button">
+					<img class="cute-icon" src="{{ app.request.getSchemeAndHttpHost() }}{{ '/src/Sharif/CalendarBundle/Resources/public/images/google-logo.png' }}">
+				</div>
+			</div>
+
 			<label for="openid_identifier">Identifier: </label>
 			<input type="text" id="openid_identifier"
 					name="openid_identifier"
@@ -70,3 +91,18 @@
 		{{ 'signup'|trans|humanize }}
 	</a>
 {% endblock body %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		$('#yahoo-cute-button').click(function(e) {
+			$('#openid_identifier').val('http://me.yahoo.com/');
+			$('#fp_openid_login').submit();
+		});
+		$('#google-cute-button').click(function(e) {
+			$('#openid_identifier').
+					val('https://www.google.com/accounts/o8/id');
+			$('#fp_openid_login').submit();
+		});
+	</script>
+{% endblock javascripts %}

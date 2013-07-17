@@ -12,7 +12,8 @@ class MonthlyDate extends RecurringDate {
 	 * @inheritdoc
 	 */
 	public function jsonSerialize() {
-		return array_merge(parent::jsonSerialize(), array('class' => 'monthly'));
+		return array_merge(parent::jsonSerialize(),
+			array('class' => 'monthly'));
 	}
 
 	/**
@@ -33,5 +34,13 @@ class MonthlyDate extends RecurringDate {
 		(($this->getBase()->getYear() - $that->getYear()) * 12 +
 		$this->getBase()->getMonth() - $that->getMonth()) %
 				$this->getStep() == 0;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function toString() {
+		$step = $this->step > 1 ? $this->step.' ' : '';
+		return 'Every '.$step.' month from '.$this->base->toString();
 	}
 }

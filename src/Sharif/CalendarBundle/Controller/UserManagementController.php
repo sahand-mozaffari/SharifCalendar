@@ -18,12 +18,12 @@ class UserManagementController extends Controller {
 	 * @param null $parent Label For internal use.
 	 * @return array Array of labels decoded from form data.
 	 */
-	private function decodeNodes($nodes, $parent=null) {
+	public static function decodeNodes($nodes, $parent=null) {
 		$result = array();
 		foreach($nodes as $node) {
 			$newLabel = (new Label(null, $node['name'],
-				intval('0X'.substr($node['color'], 1), 16), $parent))->
-				setId($node['id']);
+				intval('0X'.substr($node['color'], 1), 16), $parent,
+				$node['description'], $node['publicity']))->setId($node['id']);
 			if($parent != null) {
 				$parent->addChild($newLabel);
 			}
@@ -31,7 +31,7 @@ class UserManagementController extends Controller {
 			$result[] = $newLabel;
 			if(isset($node['items'])) {
 				$result = array_merge($result,
-					$this->decodeNodes($node['items'], $newLabel));
+					self::decodeNodes($node['items'], $newLabel));
 			}
 		}
 		return $result;
@@ -42,13 +42,15 @@ class UserManagementController extends Controller {
 	 * @return array Array containing labels owned by current user, linked as
 	 *      in a tree, and consumable by a KendoUI TreeView.
 	 */
-	private function encodeNode($node) {
+	public static function encodeNode($node) {
 		$result = array('id' => $node->getId(), 'text' => $node->getName(),
-			'color' => sprintf("#%6X", $node->getColor()), 'image' => "");
+			'color' => sprintf("#%6X", $node->getColor()), 'image' => "",
+			'description' => $node->getDescription(),
+			'publicity' => $node->isPublic());
 		if(!$node->getChildren()->isEmpty()) {
 			$children = array();
 			foreach($node->getChildren() as $child) {
-				$children[] = $this->encodeNode($child);
+				$children[] = self::encodeNode($child);
 			}
 			$result['items'] = $children;
 		}
@@ -116,7 +118,7 @@ class UserManagementController extends Controller {
 		}
 		$result = array();
 		foreach($tops as $top) {
-			$result[] = $this->encodeNode($top);
+			$result[] = self::encodeNode($top);
 		}
 
 		return $this->render(
@@ -150,7 +152,8 @@ class UserManagementController extends Controller {
 
 	public function submitLabelsAction() {
 		$em = $this->getDoctrine()->getManager();
-		$repository = $this->getDoctrine()->getRepository('Sharif\CalendarBundle\Entity\Label');
+		$repository = $this->getDoctrine()->
+			getRepository('Sharif\CalendarBundle\Entity\Label');
 		$oldLabels = $this->getUser()->getLabels();
 		$this->getUser()->clearLabels();
 
@@ -158,19 +161,23 @@ class UserManagementController extends Controller {
 		if(!empty($content)) {
 			$content = json_decode($content, true);
 		}
-		$labels = $this->decodeNodes($content);
+		$labels = self::decodeNodes($content);
 		$index = array();
 		$dbIndex = array();
 
 		foreach($labels as $label) {
 			$index[$label->getId()] = $label;
-				$dbIndex[$label->getId()] = $repository->findOneById($label->getId());
+				$dbIndex[$label->getId()] =
+					$repository->findOneById($label->getId());
 			if($dbIndex[$label->getId()] == null) {
 				$dbIndex[$label->getId()] = $label;
 				$label->setOwner($this->getUser());
 			} else {
 				$dbIndex[$label->getId()]->setName($label->getName());
 				$dbIndex[$label->getId()]->setColor($label->getColor());
+				$dbIndex[$label->getId()]->
+					setDescription($label->getDescription());
+				$dbIndex[$label->getId()]->setPublic($label->isPublic());
 			}
 			$dbIndex[$label->getId()]->clearChildren();
 			$index[$label->getId()]->clearChildren();
@@ -186,8 +193,15 @@ class UserManagementController extends Controller {
 			}
 			$this->getUser()->addLabel($dbIndex[$id]);
 		}
+		foreach(array_keys($index) as $id) {
+			$em->persist($dbIndex[$id]);
+		}
 		foreach($oldLabels as $oldLabel) {
-			if(!array_key_exists($oldLabel->getId(), array_keys($index))) {
+			if(!array_key_exists($oldLabel->getId(), $index)) {
+				foreach($oldLabel->getEvents() as $event) {
+					$event->removeLabel($oldLabel);
+					$em->persist($event);
+				}
 				$em->remove($oldLabel);
 			}
 		}

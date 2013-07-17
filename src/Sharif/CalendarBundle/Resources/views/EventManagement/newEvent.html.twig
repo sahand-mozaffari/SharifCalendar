@@ -25,7 +25,7 @@
 			display: inline-block;
 		}
 
-		#date-wrapper label {
+		#date-time-wrapper label {
 			display: inline-block;
 			font-size: xx-large;
 			color: #ffb500;
@@ -33,7 +33,7 @@
 			width: auto;
 		}
 
-		#date-wrapper label[for] {
+		#date-time-wrapper label[for] {
 			font-size: inherit;
 			color: inherit;
 			padding: inherit;
@@ -55,23 +55,34 @@
 		{{ form_label(form.labels) }}
 		<select id="labels_select"></select>
 		{{ form_widget(form.labels) }}
-		<div id="date-wrapper">
-			<br/>
-			<hr/>
-			<br/>
-			{{ form_row(form.date.date_class) }}
-			<div id="single-date-container" class="date-container">
-				{{ form_row(form.date.single_date) }}
+		<div id="date-time-wrapper">
+			<div id="date-wrapper">
+				<br/>
+				<hr/>
+				<br/>
+				{{ form_row(form.date.date_class) }}
+				<div id="single-date-container" class="date-container">
+					{{ form_row(form.date.single_date) }}
+				</div>
+				<div id="recurring-date-container" class="date-container">
+					{{ form_row(form.date.base_date) }}
+					{{ form_row(form.date.step) }}
+					{{ form_row(form.date.start_date) }}
+					{{ form_row(form.date.end_date) }}
+				</div>
+				<br/>
+				<hr/>
+				<br/>
 			</div>
-			<div id="recurring-date-container" class="date-container">
-				{{ form_row(form.date.base_date) }}
-				{{ form_row(form.date.step) }}
-				{{ form_row(form.date.start_date) }}
-				{{ form_row(form.date.end_date) }}
+			<div id="time-wrapper">
+				{{ form_row(form.timeRange.hasValue) }}
+				<div id="time-range-container">
+					{{ form_rest(form.timeRange) }}
+				</div>
+				<br/>
+				<hr/>
+				<br/>
 			</div>
-			<br/>
-			<hr/>
-			<br/>
 		</div>
 		<input type="submit" />
 		{{ form_rest(form) }}
@@ -95,6 +106,8 @@
 			var start_date_hasValue = $('#event_date_start_date_hasValue');
 			var end_date_dateValue = $('#event_date_end_date_dateValue');
 			var end_date_hasValue = $('#event_date_end_date_hasValue');
+			var event_timeRange_hasValue = $('#event_timeRange_hasValue');
+			var event_timeRange_time_range = $('#time-range-container');
 
 			if(date_date_class.val() == 'single') {
 				recurring_date_container.css('display', 'none');
@@ -107,6 +120,10 @@
 			if(!end_date_hasValue.is(':checked')) {
 				end_date_dateValue.css('display', 'none');
 			}
+			if(!event_timeRange_hasValue.is(':checked')) {
+				event_timeRange_time_range.css('display', 'none');
+			}
+
 
 			$('select[id!=labels_select]').kendoComboBox();
 			$('input[type=number][name*=year]').kendoNumericTextBox({
@@ -170,9 +187,15 @@
 				],
 				encoded: false
 			});
-			$('#event_form').submit(function(e) {
-				$('#event_labels').val(JSON.stringify(
-						$('#labels_select').data('kendoMultiSelect').value()));
+			$('#event_timeRange_time_range_startTime').kendoTimePicker({
+				interval:   15,
+				format:     "HH:mm",
+				culture:    "fa-IR"
+			});
+			$('#event_timeRange_time_range_endTime').kendoTimePicker({
+				interval: 15,
+				format: "HH:mm",
+				culture:    "fa-IR"
 			});
 
 			date_date_class.change(function(){
@@ -189,6 +212,13 @@
 			});
 			end_date_hasValue.change(function() {
 				end_date_dateValue.slideToggle();
+			});
+			event_timeRange_hasValue.change(function(e) {
+				event_timeRange_time_range.slideToggle();
+			});
+			$('#event_form').submit(function(e) {
+				$('#event_labels').val(JSON.stringify(
+						$('#labels_select').data('kendoMultiSelect').value()));
 			});
 		});
 	</script>

@@ -1,0 +1,220 @@
+{% extends "SharifCalendarBundle::baseHtml.html.twig" %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>
+		.my-selectized-input {
+			width: 400px;
+		}
+	</style>
+{% endblock stylesheets %}
+
+{% block body %}
+	<input type="text" id="email-input" placeholder="Pick some people..." class="my-selectized-input">
+	<div id="tree-container"><div id="tree-view"></div></div>
+	<button id="invite">Invite</button>
+{% endblock body %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		var localDataSource = new kendo.data.HierarchicalDataSource({
+			data: {{ labels|raw }}
+		});
+		var REGEX_EMAIL = '([a-z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)';
+		var invite;
+		var emailInput;
+		var tree_view;
+
+		$(document).ready(function() {
+			tree_view = $('#tree-view');
+			invite = $('#invite');
+			tree_view.kendoTreeView({
+				checkboxes:         false,
+				dataImageUrlField:  "image",
+				dataSource:         localDataSource,
+				dataTextField:      "text",
+				loadOnDemand:       false
+			});
+			nodes = $("#tree-view li");
+			for(i = 0; i < nodes.length; ++i) {
+				var uid = nodes[i].getAttribute("data-uid");
+				var node = localDataSource.getByUid(uid);
+				node.image = colorToImageUrl(node.color);
+			}
+			updateTreeView();
+			var $select = $('#email-input').selectize({
+				delimiter:  " ",
+				persist: true,
+				maxItems: null,
+				valueField: 'email',
+				labelField: 'name',
+				searchField: ['name', 'email'],
+				render: {
+					item: function(item, escape) {
+						return '<div>' +
+								(item.name ? '<span class="name">' + escape(item.name) + '</span>' : '') +
+								(item.email ? '<span class="email">' + escape(item.email) + '</span>' : '') +
+								'</div>';
+					},
+					option: function(item, escape) {
+						var label = item.name || item.email;
+						var caption = item.name ? item.email : null;
+						return '<div>' +
+								'<span class="label">' + escape(label) + '</span>' +
+								(caption ? '<span class="caption">' + escape(caption) + '</span>' : '') +
+								'</div>';
+					}
+				},
+				create: function(input) {
+					if ((new RegExp('^' + REGEX_EMAIL + '$', 'i')).test(input)) {
+						return {email: input};
+					}
+					var match = input.match(new RegExp('^([^<]*)\<' + REGEX_EMAIL + '\>$', 'i'));
+					if (match) {
+						return {
+							email : match[2],
+							name  : $.trim(match[1])
+						};
+					}
+					return false;
+				}
+			});
+			emailInput = $select[0].selectize;
+			invite = invite.button();
+			invite.button( "option", "disabled", true);
+
+			emailInput.on('item_add', function() {
+				if(getSelectedLabel() != null) {
+					invite.button( "option", "disabled", false);
+				}
+			});
+			emailInput.on('item_remove', function() {
+				if($('#email-input').val() == "") {
+					invite.button( "option", "disabled", true);
+				}
+			});
+			$('.k-item').click(function() {
+				if(emailInput.getValue() != "") {
+					invite.button( "option", "disabled", false);
+				}
+			})
+			invite.click(function() {
+				sendInvitation();
+			});
+		});
+	</script>
+
+	<script>
+		function getSelectedLabel() {
+			var selection = $('#tree-container .k-state-selected')[0];
+			if(selection == undefined) {
+				return null;
+			}
+			var uid = selection.parentNode.parentNode.getAttribute('data-uid');
+			return localDataSource.getByUid(uid);
+		}
+
+		function colorToImageUrl(color) {
+			// Create an empty canvas element
+			var canvas = document.createElement("canvas");
+			canvas.width = 15;
+			canvas.height = 15;
+
+			// Draw a circle
+			var ctx = canvas.getContext("2d");
+			ctx.beginPath();
+			ctx.arc(7, 7, 7, 0, Math.PI*2, true);
+			ctx.closePath();
+			ctx.fillStyle=color;
+			ctx.fill();
+
+			// Get the data-URL formatted image
+			return canvas.toDataURL("image/png");
+		}
+
+		function sendInvitation() {
+			console.log('sending...');
+			if(getSelectedLabel() == null) {
+				console.log('nothing selected');
+				noty({
+					text: 'Select a label for your friends to be invited to.',
+					layout: 'topRight',
+					type: 'warning',
+					closeWith: ['hover'],
+					timeout:    10000
+				});
+				return;
+			}
+			if(emailInput.getValue() == "") {
+				console.log('no emails...');
+				noty({
+					text: 'Enter one or few email addresses to be invited.',
+					layout: 'topRight',
+					type: 'warning',
+					closeWith: ['hover'],
+					timeout:    10000
+				});
+				return;
+			}
+			console.log('for real!');
+			var sending = noty({
+				text: 'Sending invitations...',
+				layout: 'topRight',
+				type: 'information',
+				closeWith: []
+			});
+			console.log('here comes the ajax');
+			$.ajax({
+				url:    '{{ path('sharif_calendar_send_invitations') }}',
+				data:   JSON.stringify({
+					id: getSelectedLabel()['id'],
+					emails: emailInput.getValue()
+				}),
+				method: "POST"
+			}).done(function(msg) {
+				console.log('DONE');
+				console.log(msg);
+				sending.close();
+				noty({
+					text: 'Invitations were sent successfully',
+					layout: 'topRight',
+					type: 'success',
+					closeWith: ['hover']
+				});
+			}).fail(function(msg) {
+				console.log('FAIL');
+				console.log(msg);
+				sending.close();
+				noty({
+					text: 'Sending invitations failed. Please check your connection and try again.',
+					layout: 'topRight',
+					type: 'error',
+					closeWith: ['button'],
+					buttons: [ {
+						addClass: 'btn btn-primary', text: 'Retry', onClick: function($noty) {
+							$noty.close();
+							sendInvitation();
+						}
+					}, {
+						addClass: 'btn btn-danger', text: 'Dismiss', onClick: function($noty) {
+							$noty.close();
+						}
+					}]
+				});
+			});
+		}
+
+		function updateTreeView() {
+			$("#tree-container").html(
+					"<div class=\"treeView\" id=\"tree-view\"></div>");
+			$("#tree-view").kendoTreeView({
+				checkboxes:         false,
+				dataImageUrlField:  "image",
+				dataSource:         localDataSource,
+				dataTextField:      "text",
+				loadOnDemand:       false
+			});
+		}
+	</script>
+{% endblock javascripts %}

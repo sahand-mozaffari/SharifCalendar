@@ -21,6 +21,17 @@ class Label implements \Serializable, \JsonSerializable {
 	 */
 	protected $color;
 	/**
+	 * @var string Description of this label.
+	 * @ORM\Column(type="string", length=200)
+	 */
+	protected $description;
+	/**
+	 * @var Event[] events having this label.
+	 * @ORM\ManyToMany(targetEntity="Event", inversedBy="events")
+	 * @ORM\JoinTable(name="labels_events")
+	 */
+	protected $events;
+	/**
 	 * @var int ID.
 	 * @ORM\Column(type="integer", nullable=false, unique=true)
 	 * @ORM\Id
@@ -44,20 +55,32 @@ class Label implements \Serializable, \JsonSerializable {
 	 * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
 	 */
 	protected $parent;
+	/**
+	 * @var boolean Publicity of this label.
+	 * @ORM\Column(type="boolean")
+	 */
+	protected $public;
 
 	/**
 	 * Constructor
 	 * @param $owner User who owns this label.
-	 * @param $name Name.
+	 * @param $name string Name.
 	 * @param int $color Color.
-	 * @param $parent Parent.
+	 * @param $parent Label Parent.
+	 * @param $description string Description
+	 * @param $publicity boolean Publicity
 	 */
-	public function __construct($owner, $name, $color=0xCCCCCC, $parent=null) {
+	public function __construct($owner, $name, $color=0xCCCCCC, $parent=null,
+	                            $description="", $publicity=false) {
 		$this->children = new ArrayCollection();
+		$this->events = new ArrayCollection();
+		$this->subscribers = new ArrayCollection();
 		$this->color = $color;
 		$this->name = $name;
 		$this->owner = $owner;
 		$this->parent = $parent;
+		$this->description =$description;
+		$this->setPublic($publicity);
 	}
 
 	/**
@@ -67,6 +90,16 @@ class Label implements \Serializable, \JsonSerializable {
 	 */
 	public function addChild(Label $children) {
 		$this->children[] = $children;
+		return $this;
+	}
+
+	/**
+	 * Add event
+	 * @param Event $event event to be added.
+	 * @return Label $this.
+	 */
+	public function addEvent(Event $event) {
+		$this->events[] = $event;
 		return $this;
 	}
 
@@ -91,6 +124,22 @@ class Label implements \Serializable, \JsonSerializable {
 	 */
 	public function getColor() {
 		return $this->color;
+	}
+
+	/**
+	 * Getter method for this label's description.
+	 * @return string Description of this label.
+	 */
+	public function getDescription() {
+		return $this->description;
+	}
+
+	/**
+	 * Getter method for this label's events.
+	 * @return Event[] events.
+	 */
+	public function getEvents() {
+		return $this->events;
 	}
 
 	/**
@@ -138,26 +187,44 @@ class Label implements \Serializable, \JsonSerializable {
 	}
 
 	/**
+	 * Getter method for this label's publicity
+	 * @return bool Whether or not this method is public.
+	 */
+	public function isPublic() {
+		return $this->public;
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function jsonSerialize() {
-		return array('color' => $this->color, 'name' => $this->name);
+		return array('color' => $this->color, 'name' => $this->name,
+			'id' => $this->id, 'description' => $this->description);
 	}
 
 	/**
 	 * Remove children
 	 * @param Label $children Children to be removed.
 	 */
-	public function removeChild(\Sharif\CalendarBundle\Entity\Label $children) {
+	public function removeChild(Label $children) {
 		$this->children->removeElement($children);
+	}
+
+	/**
+	 * Remove event
+	 * @param Event $event Event to be removed.
+	 */
+	public function removeEvent(Event $event) {
+		$this->events->removeElement($event);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
 	public function serialize() {
-		return serialize(array($this->children, $this->color, $this->id,
-			$this->name, $this->owner, $this->parent));
+		return urlencode(serialize(array($this->children, $this->color, $this->id,
+			$this->name, $this->owner, $this->parent, $this->public,
+			$this->description, $this->events)));
 	}
 
 	/**
@@ -167,6 +234,16 @@ class Label implements \Serializable, \JsonSerializable {
 	 */
 	public function setColor($color) {
 		$this->color = $color;
+		return $this;
+	}
+
+	/**
+	 * Setter method for this label's description.
+	 * @param $description string New value for this label's description.
+	 * @return $this
+	 */
+	public function setDescription($description)  {
+		$this->description = $description;
 		return $this;
 	}
 
@@ -212,17 +289,28 @@ class Label implements \Serializable, \JsonSerializable {
 	}
 
 	/**
+	 * Setter method for this label's publicity.
+	 * @param $public boolean New value for this field's publicity.
+	 * @return $this
+	 */
+	public function setPublic($public) {
+		$this->public = $public;
+		return $this;
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public function unserialize($serialized) {
-		$arr = unserialize($serialized);
+		$arr = unserialize(urldecode($serialized));
 		$this->children = $arr[0];
 		$this->color = $arr[1];
 		$this->id = $arr[2];
 		$this->name = $arr[3];
 		$this->owner = $arr[4];
 		$this->parent = $arr[5];
+		$this->public = $arr[6];
+		$this->description = $arr[7];
+		$this->events = $arr[8];
 	}
-
-
 }
