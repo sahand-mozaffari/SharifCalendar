@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 sharif_calendar_homepage:
     pattern:    /hello/{name}
     defaults:
@@ -15,6 +17,7 @@ sharif_calendar_add_reminder:
     defaults:
         _controller:    SharifCalendarBundle:Events:addReminder
 
+>>>>>>> origin/master
 sharif_calendar_calendar:
     pattern:    /
     defaults:
