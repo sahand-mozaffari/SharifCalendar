@@ -1,12 +1,8 @@
-sharif_calendar_homepage:
-    pattern:    /hello/{name}
-    defaults:
-        _controller:    SharifCalendarBundle:Default:index
-
 sharif_calendar_calendar:
-    pattern:    /user/calendar
+    pattern:    /
     defaults:
-        _controller:    SharifCalendarBundle:Events:calendar
+        _controller:    FrameworkBundle:Template:template
+        template:   'SharifCalendarBundle::index.html.twig'
 
 sharif_calendar_edit_event:
     pattern:    /user/edit-event/{id}

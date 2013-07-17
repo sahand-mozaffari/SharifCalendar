@@ -1,0 +1,123 @@
+@font-face {
+    font-family: 'yekan';
+    src: url('../font/BYekan.eot?#') format('eot'), url('../font/BYekan.woff') format('woff'), url('../font/BYekan.ttf') format('truetype');
+}
+
+body {
+    font-family: yekan;
+    background-image: url('../images/bg.jpg');
+    direction: rtl;
+}
+
+div {
+    border: ridge;
+}
+
+div.float-right {
+    float: right;
+    content: "";
+    display: block;
+}
+
+div#header {
+    height: 17%;
+    width: 100%;
+}
+
+div#footer {
+    width: 100%;
+    height: 3%;
+}
+
+div#content {
+    height: 80%;
+    width: 100%;
+}
+
+div#right-content {
+    height: 100%;
+    width: 20%;
+    position: relative;
+}
+
+div#main-content {
+    height: 100%;
+    width: 65%;
+}
+
+div#left-content {
+    height: 100%;
+    width: 13%;
+}
+
+div#name-uni-content {
+    width: 100%;
+    height: 17%;
+}
+
+div#program-content {
+    width: 100%;
+    height: 83%;
+    overflow-y: auto;
+    background-image: url("../images/cal-bg.png");
+    width: 100%;
+    height: 100%;
+}
+
+div.day {
+    width: 10%;
+    height: 100%;
+}
+
+div.day-uni-name {
+    text-align: center;
+    /*width: ;*/
+}
+
+div.day-name {
+    height: 35%;
+    width: 100%;
+}
+
+div.day-uni {
+    height: 65%;
+    width: 100%;
+}
+
+div.day-program {
+    position: relative;
+
+}
+
+div.time {
+    width: 5%;
+}
+
+span.times {
+    float: right;
+    clear: right;
+    border: darkviolet ridge;
+    width: 90%;
+    margin-top: 25px;
+}
+
+hr.first-lines {
+    margin-top: 40px;
+    border-color: aqua;
+    width: 90%;
+}
+
+hr.lines {
+    margin-top: 53px;
+    border-color: aqua;
+    width: 90%;
+}
+
+div.dates {
+    position: absolute;
+    top: 25%;
+}
+
+div#calendar-bg{
+
+}

@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="fa">
+<head>
+    <meta charset="utf-8">
+    <title>تقویم شریف</title>
+    <link href="static/css/custom-theme/jquery-ui-1.10.3.custom.css" rel="stylesheet">
+    <link href="static/css/base.css" rel="stylesheet">
+
+
+    <script type="text/javascript" src="static/js/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="static/js/jquery.ui.core.js"></script>
+    <script type="text/javascript" src="static/js/jquery-ui-1.10.3.custom.js"></script>
+    <script type="text/javascript" src="static/js/jquery.ui.datepicker-cc.js"></script>
+    <script type="text/javascript" src="static/js/calendar.js"></script>
+    <script type="text/javascript" src="static/js/jquery.ui.datepicker-cc-ar.js"></script>
+    <script type="text/javascript" src="static/js/jquery.ui.datepicker-cc-fa.js"></script>
+    <script type="text/javascript" src="static/js/base.js"></script>
+
+    <style>
+
+        .demoHeaders {
+            margin-top: 2em;
+        }
+
+        #dialog-link {
+            padding: .4em 1em .4em 20px;
+            text-decoration: none;
+            position: relative;
+        }
+
+        #dialog-link span.ui-icon {
+            margin: 0 5px 0 0;
+            position: absolute;
+            left: .2em;
+            top: 50%;
+            margin-top: -8px;
+        }
+
+        #icons {
+            margin: 0;
+            padding: 0;
+        }
+
+        #icons li {
+            margin: 2px;
+            position: relative;
+            padding: 4px 0;
+            cursor: pointer;
+            float: left;
+            list-style: none;
+        }
+
+        #icons span.ui-icon {
+            float: left;
+            margin: 0 4px;
+        }
+
+        .fakewindowcontain .ui-widget-overlay {
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+<div id="header">
+
+</div>
+<div id="content">
+<div id="right-content" class="float-right">
+    <div id="create-event-button" >
+        <button id="button">
+            رویداد جدید
+        </button>
+    </div>
+    <div id="change-cal-buttons">
+        <form>
+            <div id="radioset">
+                <input type="radio" id="radio1" name="radio" checked="checked" onclick="show_shamsi()"><label for="radio1">شمسی</label>
+                <input type="radio" id="radio2" name="radio"><label for="radio2" onclick="show_ghamari()">قمری</label>
+                <input type="radio" id="radio3" name="radio"><label for="radio3" onclick="show_miladi()">میلادی</label>
+            </div>
+        </form>
+    </div>
+    <div id="datepicker0" class="dates">
+
+    </div>
+    <div id="datepicker13" style="display: none" class="dates">
+
+    </div>
+    <div id="datepicker14" style="display: none" class="dates">
+
+    </div>
+</div>
+<div id="main-content" class="float-right">
+<div id="name-uni-content" class="float-right">
+    <div id="clock" class="float-right time">
+
+    </div>
+    <div id="day0" class="float-right day day-uni-name">
+        <div id="day0-name" class="day-name">
+            شنبه
+        </div>
+        <div id="day0-uni" class="day-uni">
+
+        </div>
+    </div>
+    <div id="day1" class="float-right day day-uni-name">
+        <div id="day1-name" class="day-name">
+            یک‌شنبه
+        </div>
+        <div id="day1-uni" class="day-uni">
+
+        </div>
+    </div>
+    <div id="day2" class="float-right day day-uni-name">
+        <div id="day2-name" class="day-name">
+            دوشنبه
+        </div>
+        <div id="day2-uni" class="day-uni">
+
+        </div>
+    </div>
+    <div id="day3" class="float-right day day-uni-name">
+        <div id="day3-name" class="day-name">
+            سه‌شنبه
+        </div>
+        <div id="day3-uni" class="day-uni">
+
+        </div>
+    </div>
+    <div id="day4" class="float-right day day-uni-name">
+        <div id="day4-name" class="day-name">
+            چهارشنبه
+        </div>
+        <div id="day4-uni" class="day-uni">
+
+        </div>
+    </div>
+    <div id="day5" class="float-right day day-uni-name">
+        <div id="day5-name" class="day-name">
+            پنج‌شنبه
+        </div>
+        <div id="day5-uni" class="day-uni">
+
+        </div>
+    </div>
+    <div id="day6" class="float-right day day-uni-name">
+        <div id="day6-name" class="day-name">
+            جمعه
+        </div>
+        <div id="day6-uni" class="day-uni">
+
+        </div>
+    </div>
+</div>
+<div id="program-content" class="float-right">
+    <div id="calendar-bg">
+
+    </div>
+
+    <div id="times" class="float-right time">
+                <span class="times">
+                    7:00
+                </span>
+                <span class="times">
+                    8:00
+                </span>
+                <span class="times">
+                    9:00
+                </span>
+                <span class="times">
+                    10:00
+                </span>
+                <span class="times">
+                    11:00
+                </span>
+                <span class="times">
+                    12:00
+                </span>
+                <span class="times">
+                    13:00
+                </span>
+                <span class="times">
+                    14:00
+                </span>
+                <span class="times">
+                    15:00
+                </span>
+                <span class="times">
+                    16:00
+                </span>
+                <span class="times">
+                    17:00
+                </span>
+                <span class="times">
+                    18:00
+                </span>
+                <span class="times">
+                    19:00
+                </span>
+                <span class="times">
+                    20:00
+                </span>
+                <span class="times">
+                    21:00
+                </span>
+                <span class="times">
+                    22:00
+                </span>
+                <span class="times">
+                    23:00
+                </span>
+                <span class="times">
+                    24:00
+                </span>
+    </div>
+    <div id="day0-program" class="day-program day float-right">
+        <hr class="first-lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+    </div>
+    <div id="day1-program" class="day-program day float-right">
+        <hr class="first-lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+    </div>
+    <div id="day2-program" class="day-program day float-right">
+        <hr class="first-lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+    </div>
+    <div id="day3-program" class="day-program day float-right">
+        <hr class="first-lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+    </div>
+    <div id="day4-program" class="day-program day float-right">
+        <hr class="first-lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+    </div>
+    <div id="day5-program" class="day-program day float-right">
+        <hr class="first-lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+    </div>
+    <div id="day6-program" class="day-program day float-right">
+        <hr class="first-lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+        <hr class="lines"/>
+    </div>
+</div>
+</div>
+<div id="left-content" class="float-right">
+
+</div>
+</div>
+<div id="footer">
+
+</div>
+</body>
+<script>
+    document.body.style.width = (window.screen.width - 50) + 'px';
+    document.body.style.height = (window.screen.height - 150) + 'px';
+</script>
+</html>
