@@ -1,53 +1,82 @@
 <!DOCTYPE html>
 <html>
-<head>
-	{% block head %}
-		<meta charset="UTF-8" />
-		<title>
-			{% block title %}
-				{{ 'sharif_calendar'|trans|capitalize }}
-			{% endblock %}
-		</title>
-		{% block stylesheets %}
-			{% stylesheets
-			'@SharifCalendarBundle/Resources/public/css/JQueryUI/ui-lightness/jquery-ui-1.10.3.custom.min.css'
-			'@SharifCalendarBundle/Resources/public/css/noty/buttons.css'
-			'@SharifCalendarBundle/Resources/public/js/selectize/selectize.css'
-			filter='cssrewrite'
-			%}
-			<link rel="stylesheet" href="{{ asset_url }}" />
-			<link href="http://cdn.kendostatic.com/2013.1.514/styles/kendo.common.min.css" rel="stylesheet">
-			<link href="http://cdn.kendostatic.com/2013.1.514/styles/kendo.default.min.css" rel="stylesheet">
-			{% endstylesheets %}
-		{% endblock stylesheets %}
-		<link rel="icon" type="image/x-icon"
-				href="{{ asset('favicon.ico') }}" />
-	{% endblock head %}
-</head>
-<body>
-{% block body %}{% endblock body %}
+	<head>
+		{% block head %}
+			<meta charset="UTF-8" />
+			<title>
+				{% block title %}
+					تقویم شریف
+				{% endblock %}
+			</title>
+			{% block stylesheets %}
+				{# JQuery UI #}
+				<link rel="stylesheet" href="http://localhost/src/Sharif/CalendarBundle/Resources/public/css/custom-theme/jquery-ui-1.10.3.custom.css" />
 
-{% block javascripts %}
-	<script src="http://cdn.kendostatic.com/2013.1.514/js/jquery.min.js"></script>
-	{% javascripts
-	'@SharifCalendarBundle/Resources/public/js/JQueryUi/jquery-ui-1.10.3.custom.min.js'
-	'@SharifCalendarBundle/Resources/public/js/noty/jquery.noty.js'
-	'@SharifCalendarBundle/Resources/public/js/noty/layouts/top.js'
-	'@SharifCalendarBundle/Resources/public/js/noty/layouts/topLeft.js'
-	'@SharifCalendarBundle/Resources/public/js/noty/layouts/topRight.js'
-	'@SharifCalendarBundle/Resources/public/js/noty/themes/default.js'
+				{# Kendo UI #}
+				<link rel="stylesheet" href="http://localhost/src/Sharif/CalendarBundle/Resources/public/css/kendoui/kendo.common.min.css" />
+				<link rel="stylesheet" href="http://localhost/src/Sharif/CalendarBundle/Resources/public/css/kendoui/kendo.default.min.css" />
 
-	'@SharifCalendarBundle/Resources/public/js/selectize/utils.js'
-	'@SharifCalendarBundle/Resources/public/js/selectize/constants.js'
-	'@SharifCalendarBundle/Resources/public/js/selectize/contrib/microevent.js'
-	'@SharifCalendarBundle/Resources/public/js/selectize/contrib/highlight.js'
-	'@SharifCalendarBundle/Resources/public/js/selectize/plugins.js'
-	'@SharifCalendarBundle/Resources/public/js/selectize/selectize.js'
-	'@SharifCalendarBundle/Resources/public/js/selectize/selectize.jquery.js'
-	%}
-	<script type="text/javascript" src="{{ asset_url }}"></script>
-	{% endjavascripts %}
-	<script src="http://cdn.kendostatic.com/2013.1.514/js/kendo.all.min.js"></script>
-{% endblock javascripts %}
-</body>
+				{# noty #}
+				<link rel="stylesheet" href="http://localhost/src/Sharif/CalendarBundle/Resources/public/css/noty/buttons.css" />
+
+				{# selectize #}
+				<link rel="stylesheet" href="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/selectize/selectize.css" />
+
+				{# globals #}
+				<style>
+					@font-face {
+						font-family: 'yekan';
+						src: url('{{ app.request.getSchemeAndHttpHost() }}{{ '/src/Sharif/CalendarBundle/Resources/public/font/BYekan.eot?#' }}') format('eot'), url('{{ app.request.getSchemeAndHttpHost() }}{{ '/src/Sharif/CalendarBundle/Resources/public/font/BYekan.woff' }}') format('woff'), url('{{ app.request.getSchemeAndHttpHost() }}{{ '/src/Sharif/CalendarBundle/Resources/public/font/BYekan.ttf' }}') format('truetype');
+					}
+
+					body {
+						font-family: yekan;
+						background-image: url('{{ app.request.getSchemeAndHttpHost() }}{{ '/src/Sharif/CalendarBundle/Resources/public/images/bg.jpg' }}');
+						direction: rtl;
+					}
+
+					.ui-text-button {
+						background: white;
+						cursor: text;
+						outline: none;
+						text-align: inherit;
+					}
+				</style>
+			{% endblock stylesheets %}
+			<link rel="icon" type="image/x-icon"
+					href="http://localhost/src/Sharif/CalendarBundle{{ asset('favicon.ico') }}" />
+		{% endblock head %}
+	</head>
+	<body>
+		{% block body %}{% endblock body %}
+
+		{% block javascripts %}
+			{# JQuery UI #}
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/jquery-1.8.3.js"></script>
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/myjs/jquery-ui-1.10.3.custom.js"></script>
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/myjs/jquery.ui.datepicker-cc.js"></script>
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/myjs/calendar.js"></script>
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/myjs/jquery.ui.datepicker-cc-ar.js"></script>
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/myjs/jquery.ui.datepicker-cc-fa.js"></script>
+
+			{# Kendo UI #}
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/kendoui/kendo.web.min.js"></script>
+
+			{# noty #}
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/noty/jquery.noty.js"></script>
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/noty/jquery.noty.js"></script>
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/noty/layouts/topLeft.js"></script>
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/noty/layouts/topRight.js"></script>
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/noty/themes/default.js"></script>
+
+			{# selectize #}
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/selectize/constants.js"></script>
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/selectize/utils.js"></script>
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/selectize/contrib/microevent.js"></script>
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/selectize/contrib/highlight.js"></script>
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/selectize/plugins.js"></script>
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/selectize/selectize.js"></script>
+			<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/selectize/selectize.jquery.js"></script>
+		{% endblock javascripts %}
+	</body>
 </html>

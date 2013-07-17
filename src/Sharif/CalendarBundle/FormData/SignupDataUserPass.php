@@ -31,15 +31,15 @@ class SignupDataUserPass extends AbstractType {
 	protected $username;
 
 	public function buildForm(FormBuilderInterface $fbi, array $options) {
-		$fbi->add('fullName', 'text', array('label' => 'name', 'required' => true,
+		$fbi->add('fullName', 'text', array('label' => 'نام', 'required' => true,
 		        'trim' => true, 'max_length' => 60));
-		$fbi->add('email', 'email', array('label' => 'email', 'required' => true,
+		$fbi->add('email', 'email', array('label' => 'رایانامه', 'required' => true,
 			'trim' => true, 'max_length' => 60));
-		$fbi->add('username', 'text', array('label' => 'username',
+		$fbi->add('username', 'text', array('label' => 'نام کاربری',
 		        'required' => true, 'trim' => true, 'max_length' => 254));
 		$fbi->add('password', 'repeated', array('type' => 'password',
-		        'first_options' => array('label' => 'password'),
-		        'second_options' => array('label' => 'repeat_password')));
+		        'first_options' => array('label' => 'رمز عبور'),
+		        'second_options' => array('label' => 'تکرار رمز عبور')));
 	}
 
 	/**

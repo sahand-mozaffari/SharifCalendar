@@ -48,4 +48,4 @@ security:
         - { path: sharif_calendar_signup, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/secured_area, role: ROLE_USER }
         - { path: ^/user, role: ROLE_USER }
-        - { path: ^/$, role: role_user }
+        - { path: ^/$, role: ROLE_USER }

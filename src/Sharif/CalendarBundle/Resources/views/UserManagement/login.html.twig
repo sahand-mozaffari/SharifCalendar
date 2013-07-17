@@ -3,15 +3,9 @@
 {% block stylesheets %}
 	{{ parent() }}
 	<style>
-		body {
-			background-color: steelblue;
-			font-family: sans-serif;
-			direction: rtl;
-		}
-
 		input[type=submit] {
 			position: relative;
-			right: 89px;
+			right: 75px;
 		}
 
 		.cute-button {
@@ -33,21 +27,17 @@
 		}
 
 		#wrapper {
-			background-color: #b4b4b4;
-			border-color: black;
-			border-radius: 15px;
-			border-style: solid;
-			right: -160px;
+			right: -142px;
 			margin-right: 50%;
 			padding: 10px;
 			position: relative;
-			width: 320px;
+			width: 284px;
 		}
 	</style>
 {% endblock stylesheets %}
 
 {% block body %}
-	<div id="wrapper">
+	<div id="wrapper" class="ui-state-highlight ui-corner-all">
 		{# errors #}
 		<div>
 			{% if error %}
@@ -127,13 +117,7 @@
 	{{ parent() }}
 	<script>
 		$(document).ready(function() {
-			$('input[type=text],input[type=password]').button().css({
-				'background' : 'white',
-				'cursor' : 'text',
-				'font' : 'inherit',
-				'outline' : 'none',
-				'text-align' : 'inherit'
-			}).unbind('mousedown');
+			$('input[type=text],input[type=password]').addClass('ui-button ui-state-default ui-corner-all ui-text-button ui ');
 			$('a,button,input[type=submit]').button();
 		});
 	</script>

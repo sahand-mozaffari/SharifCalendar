@@ -1,58 +1,79 @@
 {% extends "SharifCalendarBundle::baseHtml.html.twig" %}
 
 {% block stylesheets %}
+	{{ parent() }}
 	<style>
+		.cute-button {
+			display: inline-block;
+		}
+
 		.cute-icon {
 			cursor: pointer;
 			height: 50px;
 		}
-		.cute-button {
+
+		label {
 			display: inline-block;
+			width: 110px;
+		}
+
+		#cute-button-container {
+			text-align: center;
+		}
+
+		#wrapper {
+			right: -162px;
+			margin-right: 50%;
+			padding: 10px;
+			position: relative;
+			width: 325px;
 		}
 	</style>
 {% endblock stylesheets %}
 
 {% block body %}
-	<div>
-		{% for key, message in app.session.getFlashes() %}
-			<div class="{{ key }}">
-				{{ message }}
+	<div id="wrapper" class="ui-state-highlight ui-corner-all">
+		<form method="post" {{ form_enctype(formUserPass) }}>
+			{{ form_rest(formUserPass) }}
+			<input type='hidden' name='form' value='userPass' />
+			<input type='submit' value="ثبت‌نام" />
+		</form>
+		<hr />
+		<form id="fp_openid_login" method="post"
+				action="{{ path("fp_openid_security_check") }}" >
+			<div id="cute-button-container">
+				<div id="yahoo-cute-button" class="cute-button">
+					<img class="cute-icon" src="{{ app.request.getSchemeAndHttpHost() }}{{ '/src/Sharif/CalendarBundle/Resources/public/images/yahoo-logo.png' }}">
+				</div>
+				<div id="google-cute-button" class="cute-button">
+					<img class="cute-icon" src="{{ app.request.getSchemeAndHttpHost() }}{{ '/src/Sharif/CalendarBundle/Resources/public/images/google-logo.png' }}">
+				</div>
 			</div>
-		{% endfor %}
+
+			<label for="openid_identifier">شناسه</label>
+			<input type="text" id="openid_identifier"
+					name="openid_identifier"
+					value="" />
+			<br />
+			<input type="submit" id="_submit" name="_submit" value="ثبت‌نام" />
+			<input type="hidden"
+					id="target_path"
+					name="_target_path"
+					value="" />
+		</form>
 	</div>
-
-	<form id="fp_openid_login" method="post"
-			action="{{ path("fp_openid_security_check") }}" >
-		<div id="cute-button-container">
-			<div id="yahoo-cute-button" class="cute-button">
-				<img class="cute-icon" src="{{ app.request.getSchemeAndHttpHost() }}{{ '/src/Sharif/CalendarBundle/Resources/public/images/yahoo-logo.png' }}">
-			</div>
-			<div id="google-cute-button" class="cute-button">
-				<img class="cute-icon" src="{{ app.request.getSchemeAndHttpHost() }}{{ '/src/Sharif/CalendarBundle/Resources/public/images/google-logo.png' }}">
-			</div>
-		</div>
-
-		<label for="openid_identifier">Identifier: </label>
-		<input type="text" id="openid_identifier"
-				name="openid_identifier"
-				value="" />
-		<br />
-		<input type="submit" id="_submit" name="_submit" value="submit" />
-		<input type="hidden"
-				id="target_path"
-				name="_target_path"
-				value="" />
-	</form>
-	<hr />
-	<form method="post" {{ form_enctype(formUserPass) }}>
-		{{ form_rest(formUserPass) }}
-		<input type='hidden' name='form' value='userPass' />
-		<input type='submit' value="{{ 'register'|trans }}" />
-	</form>
 {% endblock body %}
 
 {% block javascripts %}
 	{{ parent() }}
+	<script>
+		$(document).ready(function() {
+			$('input[type=text],input[type=password],input[type=email]')
+					.addClass('ui-button ui-state-default ui-corner-all ui-text-button ui ');
+			$('input[type=submit]').button();
+		});
+	</script>
+
 	<script>
 		$('#yahoo-cute-button').click(function(e) {
 			$('#openid_identifier').val('http://me.yahoo.com/');

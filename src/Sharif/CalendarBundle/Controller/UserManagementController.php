@@ -1,13 +1,13 @@
 <?php
 namespace Sharif\CalendarBundle\Controller;
+use Doctrine\ORM\QueryBuilder;
+use Sharif\CalendarBundle\FormData\EventForm;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 use Sharif\CalendarBundle\Entity\Label;
 use Sharif\CalendarBundle\Entity\User;
 use Sharif\CalendarBundle\FormData\SignupDataOpenId;
 use Sharif\CalendarBundle\FormData\SignupDataUserPass;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 use Symfony\Component\Security\Core\SecurityContext;
 
 class UserManagementController extends Controller {
@@ -55,6 +55,42 @@ class UserManagementController extends Controller {
 			$result['items'] = $children;
 		}
 		return $result;
+	}
+
+	public function indexAction() {
+		$user = $this->getUser();
+		$em = $this->getDoctrine()->getManager();
+		$request = $this->getRequest();
+		$form = $this->createForm(new EventForm());
+
+		if($this->getRequest()->isMethod('post')) {
+			$form->bind($request);
+			if($form->isValid()) {
+				$event = $form->getData();
+				$event->setOwner($user);
+				$user->addEvent($event);
+				foreach($event->getLabels() as $label) {
+					$label->addEvent($event);
+					$em->persist($label);
+				}
+				$em->persist($event);
+				$em->flush();
+				return $this->redirect('sharif_calendar_calendar');
+			}
+		}
+
+		$labels = $user->getLabels();
+		$data = array();
+		foreach($labels as $label) {
+			$data[] = array('name' => $label->getName(),
+				'fullName' => $label->getFullName(),
+				'color' => sprintf("#%06X", $label->getColor()),
+				'id' => $label->getId());
+		}
+
+		return $this ->render(
+			'SharifCalendarBundle::index.html.twig',
+			array('form' => $form->createView(), 'data' => json_encode($data)));
 	}
 
 	public function loginAction() {
