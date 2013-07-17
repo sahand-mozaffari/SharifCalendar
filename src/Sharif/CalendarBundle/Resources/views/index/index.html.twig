@@ -3,6 +3,7 @@
 {% block stylesheets %}
 	{{ parent() }}
 	<link href="http://localhost/src/Sharif/CalendarBundle/Resources/public/css/base.css" rel="stylesheet">
+	<link href="http://localhost/src/Sharif/CalendarBundle/Resources/public/css/mycss/newEvent.css" rel="stylesheet">
 
 	<style>
 		.demoHeaders {
@@ -351,16 +352,16 @@
 
 	</div>
 	<div id="create-event-form" style="display: none">
-		{# TODO: new event window #}
+		{% include 'SharifCalendarBundle:index:newEvent.html.twig' %}
 	</div>
 {% endblock body %}
 
 {% block javascripts %}
 	{{ parent() }}
 	<script type="text/javascript" src="http://localhost/src/Sharif/CalendarBundle/Resources/public/js/myjs/base.js"></script>
-
 	<script>
 	    document.body.style.width = (window.screen.width - 50) + 'px';
 	    document.body.style.height = (window.screen.height - 150) + 'px';
 	</script>
+	{% include 'SharifCalendarBundle:index:newEvent.js.twig' %}
 {% endblock javascripts %}

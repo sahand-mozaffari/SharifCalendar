@@ -1,0 +1,170 @@
+<script id="itemTemplate" type="text/x-kendo-tmpl">
+	#: data.fullName #
+</script>
+<script id="tagTemplate" type="text/x-kendo-tmpl">
+	<span style="color: #: data.color#;"> #: data.name # </span>
+</script>
+<script>
+	$(document).ready(function() {
+		var date_date_class = $("#event_date_date_class");
+		var single_date_container = $('#single-date-container');
+		var recurring_date_container = $('#recurring-date-container');
+		var start_date_dateValue = $('#event_date_start_date_dateValue');
+		var start_date_hasValue = $('#event_date_start_date_hasValue');
+		var end_date_dateValue = $('#event_date_end_date_dateValue');
+		var end_date_hasValue = $('#event_date_end_date_hasValue');
+		var event_timeRange_hasValue = $('#event_timeRange_hasValue');
+		var event_timeRange_time_range = $('#time-range-container');
+
+		if(date_date_class.val() == 'single') {
+			recurring_date_container.css('display', 'none');
+		} else {
+			single_date_container.css('display', 'none');
+		}
+		if(!start_date_hasValue.is(':checked')) {
+			start_date_dateValue.css('display', 'none');
+		}
+		if(!end_date_hasValue.is(':checked')) {
+			end_date_dateValue.css('display', 'none');
+		}
+		if(!event_timeRange_hasValue.is(':checked')) {
+			event_timeRange_time_range.css('display', 'none');
+		}
+
+
+		$('select[id!=labels_select]').kendoComboBox();
+		$('input[type=number][name*=year]').kendoNumericTextBox({
+			downArrowText: "Down",
+			format: "",
+			max: 3000,
+			min: 0,
+			spinners: false,
+			upArrowText: "Up"
+		});
+		$('input[type=number][name*=month]').kendoNumericTextBox({
+			downArrowText: "Down",
+			format: "",
+			max: 12,
+			min: 1,
+			spinners: false,
+			upArrowText: "Up"
+		});
+		$('input[type=number][name*=day]').kendoNumericTextBox({
+			downArrowText: "Down",
+			format: "",
+			max: 31,
+			min: 1,
+			spinners: false,
+			upArrowText: "Up"
+		});
+		$('input[type=number][name*=step]').kendoNumericTextBox({
+			downArrowText: "Down",
+			format: "",
+			min: 1,
+			upArrowText: "Up"
+		});
+		$('input[type=submit]').button();
+		$("#event_title").button().css({
+			'cursor' : 'text',
+			'font' : 'inherit',
+			'outline' : 'none',
+			'text-align' : 'inherit',
+			'background' : 'white'
+		}).unbind('mousedown');
+		$('#labels_select').kendoMultiSelect({
+			dataSource: {{ data|raw }},
+			dataTextField: 'name',
+			dataValueField: 'id',
+			filter: 'contains',
+			placeholder: '{{ 'no_labels'|trans|humanize }}',
+			itemTemplate: $("#itemTemplate").html(),
+			tagTemplate: $("#tagTemplate").html(),
+			value:  JSON.parse($('#event_labels').val())
+		});
+		$("#event_description").kendoEditor({
+			tools: [
+				"bold", "italic", "underline", "strikethrough", "fontName",
+				"fontSize", "foreColor", "backColor", "justifyLeft",
+				"justifyCenter", "justifyRight", "justifyFull",
+				"insertUnorderedList", "insertOrderedList", "indent",
+				"outdent", "fomatting", "createLink", "unlink",
+				"insertImage", "subscript", "superscript", "createTable",
+				"addColumnLeft", "addColumnRight", "addRowAbove",
+				"addRowBelow", "deleteRow", "deleteColumn"
+			],
+			encoded: false
+		});
+		$('#event_timeRange_time_range_startTime').kendoTimePicker({
+			interval:   15,
+			format:     "HH:mm",
+			culture:    "fa-IR"
+		});
+		$('#event_timeRange_time_range_endTime').kendoTimePicker({
+			interval: 15,
+			format: "HH:mm",
+			culture:    "fa-IR"
+		});
+
+		date_date_class.change(function(){
+			if(date_date_class.val() == 'single') {
+				recurring_date_container.slideUp();
+				single_date_container.slideDown();
+			} else {
+				recurring_date_container.slideDown();
+				single_date_container.slideUp();
+			}
+		});
+		start_date_hasValue.change(function() {
+			start_date_dateValue.slideToggle();
+		});
+		end_date_hasValue.change(function() {
+			end_date_dateValue.slideToggle();
+		});
+		event_timeRange_hasValue.change(function(e) {
+			event_timeRange_time_range.slideToggle();
+		});
+		$('#event_form').submit(function(e) {
+			$('#event_labels').val(JSON.stringify(
+					$('#labels_select').data('kendoMultiSelect').value()));
+			e.preventDefault();
+			postForm();
+		});
+	});
+
+	function postForm() {
+		$.ajax({
+			data:   $('#event_form').serialize(),
+			url:    '{{ path('sharif_calendar_new_event') }}',
+			method: 'POST'
+		}).done(function (msg) {
+			console.log(msg);
+			noty({
+				text: 'Event created successfully.',
+				layout: 'topRight',
+				type: 'success',
+				timeout:    5000,
+				closeWith: ['hover']
+			});
+			// Close the dialog window maybe.
+		}).fail(function (msg) {
+			console.log(msg);
+			// msg contains the form errors. could be used to hint user.
+			noty({
+				text: 'Failed to create new event. Try again?',
+				layout: 'topRight',
+				type: 'error',
+				closeWith: ['button'],
+				buttons: [ {
+					addClass: 'btn btn-primary', text: 'Retry', onClick: function($noty) {
+						$noty.close();
+						postForm();
+					}
+				}, {
+					addClass: 'btn btn-danger', text: 'Dismiss', onClick: function($noty) {
+						$noty.close();
+					}
+				}]
+			});
+		});
+	}
+</script>

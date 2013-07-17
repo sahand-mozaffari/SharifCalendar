@@ -1,0 +1,41 @@
+label {
+	display: inline-block;
+	width: 100px;
+}
+
+.k-editor {
+	border-radius: 7px;
+	display: inline-table;
+	width: 600px;
+	height: 350px;
+}
+
+.k-widget {
+	margin: 5px;
+}
+
+.k-multiselect {
+	margin-left: 0;
+	width: 600px;
+	display: inline-block;
+}
+
+#date-time-wrapper label {
+	display: inline-block;
+	font-size: xx-large;
+	color: #ffb500;
+	padding: 10px;
+	width: auto;
+}
+
+#date-time-wrapper label[for] {
+	font-size: inherit;
+	color: inherit;
+	padding: inherit;
+	width: 100px;
+}
+
+#event_title {
+	width:  600px;
+	margin-left: 5px;
+}

@@ -1,0 +1,39 @@
+<form id="event_form" method="POST">
+	{{ form_row(form.title) }}
+	{{ form_row(form.description) }}
+	{{ form_errors(form.labels) }}
+	{{ form_label(form.labels) }}
+	<select id="labels_select"></select>
+	{{ form_widget(form.labels) }}
+	<div id="date-time-wrapper">
+		<div id="date-wrapper">
+			<br/>
+			<hr/>
+			<br/>
+			{{ form_row(form.date.date_class) }}
+			<div id="single-date-container" class="date-container">
+				{{ form_row(form.date.single_date) }}
+			</div>
+			<div id="recurring-date-container" class="date-container">
+				{{ form_row(form.date.base_date) }}
+				{{ form_row(form.date.step) }}
+				{{ form_row(form.date.start_date) }}
+				{{ form_row(form.date.end_date) }}
+			</div>
+			<br/>
+			<hr/>
+			<br/>
+		</div>
+		<div id="time-wrapper">
+			{{ form_row(form.timeRange.hasValue) }}
+			<div id="time-range-container">
+				{{ form_rest(form.timeRange) }}
+			</div>
+			<br/>
+			<hr/>
+			<br/>
+		</div>
+	</div>
+	<input type="submit" />
+	{{ form_rest(form) }}
+</form>

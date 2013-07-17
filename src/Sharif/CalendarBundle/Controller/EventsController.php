@@ -45,52 +45,53 @@ class EventsController extends Controller {
 	}
 
 	public function editEventAction($id) {
-		$user = $this->getUser();
-		$request = $this->getRequest();
-		$em = $this->getDoctrine()->getManager();
-		$oldEvent = $this->getDoctrine()->
-			getRepository('SharifCalendarBundle:Event')->findOneById($id);
-		if($oldEvent == null ||
-				$oldEvent->getOwner()->getId() != $user->getId()) {
-			return $this->createNotFoundException();
-		}
-		$form = $this->createForm(new EventForm(), clone $oldEvent);
-
-		if($this->getRequest()->isMethod('post')) {
-			$form->bind($request);
-			if($form->isValid()) {
-				$newEvent = $form->getData();
-				$oldEvent->setDate($this->copyDate($newEvent->getDate()));
-				$oldEvent->setTitle($newEvent->getTitle());
-				$oldEvent->setDescription($newEvent->getDescription());
-				foreach($oldEvent->getLabels() as $oldLabel) {
-					$oldLabel->removeEvent($oldEvent);
-					$em->persist($oldLabel);
-				}
-				$oldEvent->setLabels(clone $newEvent->getLabels());
-				foreach($newEvent->getLabels() as $newLabel) {
-					$newLabel->addEvent($oldEvent);
-					$em->persist($newLabel);
-				}
-				$em->persist($oldEvent->getDate());
-				$em->persist($oldEvent);
-				$em->flush();
-				return $this->redirect($this->generateUrl('sharif_calendar_calendar'));
-			}
-		}
-
-		$labels = $user->getLabels();
-		$data = array();
-		foreach($labels as $label) {
-			$data[] = array('name' => $label->getName(),
-				'fullName' => $label->getFullName(),
-				'color' => sprintf("#%06X", $label->getColor()),
-				'id' => $label->getId());
-		}
-
-		return $this ->render(
-			'SharifCalendarBundle:EventManagement:newEvent.html.twig',
-			array('form' => $form->createView(), 'data' => json_encode($data)));
+		// TODO: fix
+//		$user = $this->getUser();
+//		$request = $this->getRequest();
+//		$em = $this->getDoctrine()->getManager();
+//		$oldEvent = $this->getDoctrine()->
+//			getRepository('SharifCalendarBundle:Event')->findOneById($id);
+//		if($oldEvent == null ||
+//				$oldEvent->getOwner()->getId() != $user->getId()) {
+//			return $this->createNotFoundException();
+//		}
+//		$form = $this->createForm(new EventForm(), clone $oldEvent);
+//
+//		if($this->getRequest()->isMethod('post')) {
+//			$form->bind($request);
+//			if($form->isValid()) {
+//				$newEvent = $form->getData();
+//				$oldEvent->setDate($this->copyDate($newEvent->getDate()));
+//				$oldEvent->setTitle($newEvent->getTitle());
+//				$oldEvent->setDescription($newEvent->getDescription());
+//				foreach($oldEvent->getLabels() as $oldLabel) {
+//					$oldLabel->removeEvent($oldEvent);
+//					$em->persist($oldLabel);
+//				}
+//				$oldEvent->setLabels(clone $newEvent->getLabels());
+//				foreach($newEvent->getLabels() as $newLabel) {
+//					$newLabel->addEvent($oldEvent);
+//					$em->persist($newLabel);
+//				}
+//				$em->persist($oldEvent->getDate());
+//				$em->persist($oldEvent);
+//				$em->flush();
+//				return $this->redirect($this->generateUrl('sharif_calendar_calendar'));
+//			}
+//		}
+//
+//		$labels = $user->getLabels();
+//		$data = array();
+//		foreach($labels as $label) {
+//			$data[] = array('name' => $label->getName(),
+//				'fullName' => $label->getFullName(),
+//				'color' => sprintf("#%06X", $label->getColor()),
+//				'id' => $label->getId());
+//		}
+//
+//		return $this ->render(
+//			'SharifCalendarBundle:EventManagement:newEvent.html.twig',
+//			array('form' => $form->createView(), 'data' => json_encode($data)));
 	}
 
 	public function enlistEventsAction() {
@@ -213,34 +214,22 @@ class EventsController extends Controller {
 		$request = $this->getRequest();
 		$form = $this->createForm(new EventForm());
 
-		if($this->getRequest()->isMethod('post')) {
-			$form->bind($request);
-			if($form->isValid()) {
-				$event = $form->getData();
-				$event->setOwner($user);
-				$user->addEvent($event);
-				foreach($event->getLabels() as $label) {
-					$label->addEvent($event);
-					$em->persist($label);
-				}
-				$em->persist($event);
-				$em->flush();
-				return $this->redirect('sharif_calendar_calendar');
+		$form->bind($request);
+		if($form->isValid()) {
+			$event = $form->getData();
+			$event->setOwner($user);
+			$user->addEvent($event);
+			foreach($event->getLabels() as $label) {
+				$label->addEvent($event);
+				$em->persist($label);
 			}
+			$em->persist($event);
+			$em->flush();
+			return new Response();
+		} else {
+			return new JsonResponse($form->getErrors(), 400);
 		}
 
-		$labels = $user->getLabels();
-		$data = array();
-		foreach($labels as $label) {
-			$data[] = array('name' => $label->getName(),
-				'fullName' => $label->getFullName(),
-				'color' => sprintf("#%06X", $label->getColor()),
-				'id' => $label->getId());
-		}
-
-		return $this ->render(
-			'SharifCalendarBundle:EventManagement:newEvent.html.twig',
-			array('form' => $form->createView(), 'data' => json_encode($data)));
 	}
 
 	public function removeReminderAction() {

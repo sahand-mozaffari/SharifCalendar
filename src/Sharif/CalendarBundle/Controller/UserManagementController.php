@@ -59,25 +59,7 @@ class UserManagementController extends Controller {
 
 	public function indexAction() {
 		$user = $this->getUser();
-		$em = $this->getDoctrine()->getManager();
-		$request = $this->getRequest();
 		$form = $this->createForm(new EventForm());
-
-		if($this->getRequest()->isMethod('post')) {
-			$form->bind($request);
-			if($form->isValid()) {
-				$event = $form->getData();
-				$event->setOwner($user);
-				$user->addEvent($event);
-				foreach($event->getLabels() as $label) {
-					$label->addEvent($event);
-					$em->persist($label);
-				}
-				$em->persist($event);
-				$em->flush();
-				return $this->redirect('sharif_calendar_calendar');
-			}
-		}
 
 		$labels = $user->getLabels();
 		$data = array();
@@ -89,7 +71,7 @@ class UserManagementController extends Controller {
 		}
 
 		return $this ->render(
-			'SharifCalendarBundle::index.html.twig',
+			'SharifCalendarBundle:index:index.html.twig',
 			array('form' => $form->createView(), 'data' => json_encode($data)));
 	}
 
