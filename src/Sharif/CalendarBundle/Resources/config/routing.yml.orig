@@ -1,0 +1,128 @@
+<<<<<<< HEAD
+=======
+sharif_calendar_homepage:
+    pattern:    /hello/{name}
+    defaults:
+        _controller:    SharifCalendarBundle:Default:index
+
+sharif_calendar_accept_invitation:
+    pattern:    /user/subscribe_label/{id}
+    defaults:
+        _controller:    SharifCalendarBundle:Events:acceptInvitation
+    requirements:
+        id: \d+
+
+sharif_calendar_add_reminder:
+    pattern:    /user/add_reminder
+    defaults:
+        _controller:    SharifCalendarBundle:Events:addReminder
+
+>>>>>>> origin/master
+sharif_calendar_calendar:
+    pattern:    /
+    defaults:
+        _controller:    FrameworkBundle:Template:template
+        template:   'SharifCalendarBundle::index.html.twig'
+
+sharif_calendar_edit_event:
+    pattern:    /user/edit-event/{id}
+    defaults:
+        _controller:    SharifCalendarBundle:Events:editEvent
+
+sharif_calendar_enlist_events:
+    pattern:    /user/enlist_event
+    defaults:
+        _controller:    SharifCalendarBundle:Events:enlistEvents
+
+sharif_calendar_invitation_list:
+    pattern:    /user/invite
+    defaults:
+        _controller:    SharifCalendarBundle:Events:invitationList
+
+sharif_calendar_login:
+    pattern:    /login
+    defaults:
+        _controller:    SharifCalendarBundle:UserManagement:login
+
+sharif_calendar_login_check:
+    pattern:    /secured_area/login_check
+
+sharif_calendar_new_event:
+    pattern:    /user/new_event
+    defaults:
+        _controller:    SharifCalendarBundle:Events:new
+
+sharif_calendar_query_event:
+    pattern:    /user/query/event/{fromYear}/{fromMonth}/{fromDay}/{toYear}/{toMonth}/{toDay}
+    defaults:
+        _controller:    SharifCalendarBundle:Events:getEvents
+    requirements:
+        from-year:  \d+
+        from-month: \d+
+        from-day:   \d+
+        to-year:    \d+
+        to-month:   \d+
+        to-day:     \d+
+
+sharif_calendar_query_label:
+    pattern:    /user/query/label
+    defaults:
+        _controller:    SharifCalendarBundle:Events:getLabels
+
+sharif_calendar_remove_reminder:
+    pattern:    /user/remove_reminder
+    defaults:
+        _controller:    SharifCalendarBundle:Events:removeReminder
+
+sharif_calendar_search_events:
+    pattern:    /user/search_event
+    defaults:
+        _controller:    SharifCalendarBundle:Events:searchEvents
+
+sharif_calendar_search_labels:
+    pattern:    /user/search_label
+    defaults:
+        _controller:    FrameworkBundle:Template:template
+        template:   'SharifCalendarBundle:EventManagement:searchLabel.html.twig'
+
+sharif_calendar_send_invitations:
+    pattern:    /user/setting/labels
+    defaults:
+        _controller:    SharifCalendarBundle:Events:sendInvitations
+
+sharif_calendar_setting_labels:
+    pattern:    /user/setting/labels
+    defaults:
+        _controller:    SharifCalendarBundle:UserManagement:settingLabels
+
+sharif_calendar_signup:
+    pattern:    /signup
+    defaults:
+        _controller:    SharifCalendarBundle:UserManagement:signup
+
+sharif_calendar_signup_successful:
+    pattern:    /signup_successful
+    defaults:
+        _controller:    FrameworkBundle:Template:template
+        template:   'SharifCalendarBundle:UserManagement:signupSuccessful.html.twig'
+
+sharif_calendar_subscribe_labels:
+    pattern:    /user/subscribe_label
+    defaults:
+        _controller:    SharifCalendarBundle:Events:subscribeLabel
+
+sharif_calendar_submit_labels:
+    pattern:    /user/submit/labels
+    defaults:
+        _controller:    SharifCalendarBundle:UserManagement:submitLabels
+
+sharif_calendar_unsubscribe_labels:
+    pattern:    /user/unsubscribe_label
+    defaults:
+        _controller:    SharifCalendarBundle:Events:unsubscribeLabel
+
+sharif_calendar_mailer:
+    pattern:    /mail
+    host: "localhost"
+    defaults:
+        _controller:    SharifCalendarBundle:Default:sendMail
