@@ -20,6 +20,13 @@ sharif_calendar_calendar:
     defaults:
         _controller:    SharifCalendarBundle:UserManagement:index
 
+# Removes an event from the list. The id should be transferred via POST method.
+sharif_calendar_delete_event:
+    pattern:    /user/removeEvent/
+    defaults:
+        _controller:    SharifCalendarBundle:Events:deleteEvent
+    methods:    [POST]
+
 # Edits an event. Event's ID is already stored in session.
 sharif_calendar_edit_event:
     pattern:    /user/edit-event

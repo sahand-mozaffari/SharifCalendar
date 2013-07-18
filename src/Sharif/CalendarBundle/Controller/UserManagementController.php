@@ -43,10 +43,7 @@ class UserManagementController extends Controller {
 	 *      in a tree, and consumable by a KendoUI TreeView.
 	 */
 	public static function encodeNode($node) {
-		$result = array('id' => $node->getId(), 'text' => $node->getName(),
-			'color' => sprintf("#%6X", $node->getColor()), 'image' => "",
-			'description' => $node->getDescription(),
-			'publicity' => $node->isPublic());
+		$result = self::nodeToJsonArray($node);
 		if(!$node->getChildren()->isEmpty()) {
 			$children = array();
 			foreach($node->getChildren() as $child) {
@@ -55,6 +52,13 @@ class UserManagementController extends Controller {
 			$result['items'] = $children;
 		}
 		return $result;
+	}
+
+	public static function nodeToJsonArray($node) {
+		return array('id' => $node->getId(), 'text' => $node->getName(),
+			'color' => sprintf("#%6X", $node->getColor()), 'image' => "",
+			'description' => $node->getDescription(),
+			'publicity' => $node->isPublic());
 	}
 
 	public function indexAction() {

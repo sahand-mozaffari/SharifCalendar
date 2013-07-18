@@ -40,6 +40,6 @@ class AnnualDate extends RecurringDate {
 	 */
 	public function toString() {
 		$step = $this->step > 1 ? $this->step.' ' : '';
-		return 'Every '.$step.' year from '.$this->base->toString();
+		return 'هر '.$step.' سال، از '.$this->base->toString();
 	}
 }

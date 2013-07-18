@@ -3,45 +3,63 @@
 {% block stylesheets %}
 	{{ parent() }}
 	<style>
+		.control-button {
+			margin: 2px;
+		}
+
 		.event-box {
-			border-color: orange;
-			border-radius: 10px;
-			border-style: solid;
-			border-width: 1px;
 			padding: 5px;
 			width: 600px;
 			margin: 5px;
 		}
 
 		.event-controls img {
-			background-color: #EEEEEE;
-			border-radius: 10px;
 			cursor: pointer;
-			float: right;
+			float: left;
 			padding: 2px;
 		}
 
-		.event-controls img:hover {
-			background-color: #CCCCCC;
-		}
-
-		.event-date-time img {
-			font-size: x-small;
+		.event-date-time {
 			color: grey;
+			font-size: small;
+			margin-top: 4px;
 		}
 
 		.label {
 			border-radius: 10px;
-			margin: 0 2px 11px 2px;
-			padding: 2px 7px 2px 7px;
+			font-size: small;
+			margin: 0 2px 14px 2px;
+			padding: 5px 7px 2px 7px;
+		}
+
+		#search {
+			width: 525px;
+		}
+
+		#tree-container {
+			direction: ltr;
+			padding: 5px
+		}
+
+		#wrapper {
+			margin-right: -310px;
+			padding: 10px;
+			position: relative;
+			right: 50%;
+			width: 620px;
 		}
 	</style>
 {% endblock stylesheets %}
 
 {% block body %}
-	<input type="search" id="search">
-	<div id="tree-container"><div id="tree-view"></div></div>
-	<div id="result-container"></div>
+	<div id="wrapper" class="ui-state-highlight ui-corner-all">
+		<div id="top-box">
+			<input type="search" id="search" placeholder="جستجو...">
+			<button id="go">جستجو</button>
+		</div>
+		<div id="tree-container"><div id="tree-view"></div></div>
+		<div id="result-container"></div>
+	</div>
 	<div id="dialog"></div>
 {% endblock body %}
 
@@ -56,13 +74,10 @@
 		$(document).ready(function() {
 			var search = $("#search");
 			var tree_view = $('#tree-view');
-			search.button().css({
-				'background' : 'white',
-				'cursor' : 'text',
-				'font' : 'inherit',
-				'outline' : 'none',
-				'text-align' : 'inherit'
-			}).unbind('mousedown');
+			var go = $('#go');
+			go.button();
+			search.addClass(
+					'ui-button ui-state-default ui-corner-all ui-text-button ui ');
 			tree_view.kendoTreeView({
 				checkboxes:         true,
 				dataImageUrlField:  "image",
@@ -70,7 +85,9 @@
 				dataTextField:      "text",
 				loadOnDemand:       false
 			});
+
 			search.change(reload);
+			go.click(reload);
 			nodes = $("#tree-view li");
 			for(i = 0; i < nodes.length; ++i) {
 				var uid = nodes[i].getAttribute("data-uid");
@@ -96,7 +113,7 @@
 				img.attr('src', '{{ app.request.getSchemeAndHttpHost()}}{{ '/src/Sharif/CalendarBundle/Resources/public/images/reminder-not.png' }}');
 			}).fail(function(msg) {
 				noty({
-					text: 'Failed to add reminder. Check your connection and try again.',
+					text: 'ایجاد یادآور با مشکل مواجه شد. لطفاً دوباره تلاش نمایید.',
 					layout: 'topRight',
 					type: 'warning',
 					closeWith: ['hover']
@@ -104,9 +121,15 @@
 			});
 		}
 
-		function bindClickAdd(id) {
+		function bindClickAddReminder(id) {
 			$('#img-'+id).click(function() {
 				addReminder(id);
+			});
+		}
+
+		function bindClickDelete(id) {
+			$('#img3-'+id).click(function() {
+				confirmDeleteEvent(id);
 			});
 		}
 
@@ -116,7 +139,7 @@
 			});
 		}
 
-		function bindClickRemove(id) {
+		function bindClickRemoveReminder(id) {
 			$('#img-'+id).click(function() {
 				removeReminder(id);
 			});
@@ -156,6 +179,56 @@
 			return canvas.toDataURL("image/png");
 		}
 
+		function confirmDeleteEvent(id) {
+			var title = $('#event-'+id+' .event-title').text().trim();
+
+			noty({
+				text: 'آیا می‌خواهید رویداد «' + title + '» حذف شود؟',
+				layout: 'center',
+				type: 'error',
+				closeWith: ['button'],
+				buttons: [ {
+					addClass: 'btn btn-primary', text: 'خیر', onClick: function($noty) {
+						$noty.close();
+					}
+				}, {
+					addClass: 'btn btn-danger', text: 'بله', onClick: function($noty) {
+						$noty.close();
+						deleteEvent(id);
+					}
+				}]
+			});
+		}
+
+		function deleteEvent(id) {
+			var event = $('#event-'+id);
+			var title = $('#event-'+id+' .event-title').text().trim();
+
+			$.ajax({
+				url:    '{{ path('sharif_calendar_delete_event') }}',
+				data:   id.toString(),
+				type: 'post'
+			}).done(function(msg) {
+				noty({
+					text: 'رویداد «' + title + '»' + 'حذف شد.',
+					layout: 'topRight',
+					type: 'success',
+					closeWith: ['hover']
+				});
+				event.slideUp(function() {
+					event.parentNode.removeChild(event);
+				});
+			}).fail(function(msg) {
+				console.log(msg);
+				noty({
+					text: 'حذف رویداد «' + title + '»' + 'با مشکل مواجه شد.',
+					layout: 'topRight',
+					type: 'error',
+					closeWith: ['hover']
+				});
+			});
+		}
+
 		function editEvent(id) {
 			$.ajax({
 				type:   'POST',
@@ -168,17 +241,17 @@
 				dialog.dialog();
 			}).fail(function(msg) {
 				noty({
-					text: 'Failed to load your settings. Try again?',
+					text: 'بارگیری اطلاعات مورد نظر با مشکل مواجه شد. لطفاً دوباره تلاش کنید.',
 					layout: 'topRight',
 					type: 'error',
 					closeWith: ['button'],
 					buttons: [ {
-						addClass: 'btn btn-primary', text: 'Retry', onClick: function($noty) {
+						addClass: 'btn btn-primary', text: 'دوباره', onClick: function($noty) {
 							$noty.close();
 							editEvent(id);
 						}
 					}, {
-						addClass: 'btn btn-danger', text: 'Dismiss', onClick: function($noty) {
+						addClass: 'btn btn-danger', text: 'لغو', onClick: function($noty) {
 							$noty.close();
 						}
 					}]
@@ -205,10 +278,12 @@
 				for(i = 0; i < msg.length; ++i) {
 					var event = msg[i];
 					var box =
-						("<div class='event-box' id='event-__ID__' eventId='__ID__'>" +
+						("<div class='event-box ui-state-highlight ui-corner-all' id='event-__ID__'>" +
 						"   <div class='event-controls'>" +
-						"       <img class='reminder-button control-button' id='img-__ID__' src='{{ app.request.getSchemeAndHttpHost()}}{{ '/src/Sharif/CalendarBundle/Resources/public/images/__REMIND__' }}' />" +
-						"       <img class='edit-button control-button' id='img2-__ID__' src='{{ app.request.getSchemeAndHttpHost()}}{{ '/src/Sharif/CalendarBundle/Resources/public/images/edit.png' }}' />" +
+						"       <img class='reminder-button control-button' id='img-__ID__' src='{{ app.request.getSchemeAndHttpHost()}}{{ '/src/Sharif/CalendarBundle/Resources/public/images/__REMIND__' }}' title='ایجاد یادآوری' />" +
+						(event['mine'] ?
+							"<img class='edit-button control-button' id='img2-__ID__' src='{{ app.request.getSchemeAndHttpHost()}}{{ '/src/Sharif/CalendarBundle/Resources/public/images/edit.png' }}' title='ویرایش' />" +
+							"<img class='remove-button control-button' id='img3-__ID__' src='{{ app.request.getSchemeAndHttpHost()}}{{ '/src/Sharif/CalendarBundle/Resources/public/images/remove.png' }}' title='حذف' />" : "") +
 						"   </div>" +
 						"   <div class='event-title'>" +
 						"       <h4>__TITLE__</h4>" +
@@ -244,29 +319,35 @@
 				}
 				result_container.slideUp(function() {
 					result_container.html(html);
+					$('.control-button').button();
 					for(i = 0; i < msg.length; ++i) {
 						if(msg[i]['hasReminder']) {
-							bindClickRemove(msg[i]['id']);
+							bindClickRemoveReminder(msg[i]['id']);
 						} else {
-							bindClickAdd(msg[i]['id']);
+							bindClickAddReminder(msg[i]['id']);
 						}
 						bindClickEdit(msg[i]['id']);
+						bindClickDelete(msg[i]['id']);
 					}
 					result_container.slideDown();
 				});
 			}).fail(function(msg) {
 				noty({
-					text: 'Failed to carry out your request. Try again?',
+					text: 'جستجو با مشکل مواجه شد. لطفاً دوباره تلاش نمایید.',
 					layout: 'topRight',
 					type: 'error',
 					closeWith: ['button'],
 					buttons: [ {
-						addClass: 'btn btn-primary', text: 'Retry', onClick: function($noty) {
+						addClass: 'btn btn-primary',
+						text: 'دوباره',
+						onClick: function($noty) {
 							$noty.close();
 							reload();
 						}
 					}, {
-						addClass: 'btn btn-danger', text: 'Dismiss', onClick: function($noty) {
+						addClass: 'btn btn-danger',
+						text: 'لغو',
+						onClick: function($noty) {
 							$noty.close();
 						}
 					}]
@@ -288,7 +369,7 @@
 				img.attr('src', '{{ app.request.getSchemeAndHttpHost()}}{{ '/src/Sharif/CalendarBundle/Resources/public/images/reminder.png' }}');
 			}).fail(function() {
 				noty({
-					text: 'Failed to remove reminder. Check your connection and try again.',
+					text: 'حذف یادآور با مشکل مواجه شد. لطفاً دوباره تلاش نمایید.',
 					layout: 'topRight',
 					type: 'warning',
 					closeWith: ['hover']

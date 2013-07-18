@@ -44,6 +44,28 @@ class EventsController extends Controller {
 		return new Response();
 	}
 
+	public function deleteEventAction() {
+		$id = intval($this->getRequest()->getContent());
+		$user = $this->getUser();
+		$em = $this->getDoctrine()->getManager();
+		$event = $this->getDoctrine()->
+			getRepository('SharifCalendarBundle:Event')->findOneById($id);
+		if($event == null || $event->getOwner()->getId() != $user->getId()) {
+			return $this->createNotFoundException();
+		}
+
+		var_dump($event->getTitle());
+		$user->removeEvent($event);
+		foreach($event->getLabels() as $label) {
+			$label->removeEvent($event);
+			$em->persist($label);
+		}
+		$em->remove($event);
+		$em->persist($user);
+		$em->flush();
+		return new Response();
+	}
+
 	public function editEventAction() {
 		$id = $this->get('session')->get('editingEventId');
 		$user = $this->getUser();
@@ -130,7 +152,10 @@ class EventsController extends Controller {
 			if(count($checkedLabels) === 0) {
 				$result[] = array_merge($event->jsonSerialize(),
 					array('hasReminder' =>
-					in_array($event, $user->getReminders()->toArray(), true)));
+						in_array($event, $user->getReminders()->toArray(),
+							true) , 'mine' => ($event->getOwner()->getId() ==
+								$user->getId())
+				));
 				continue 1;
 			}
 
@@ -139,7 +164,11 @@ class EventsController extends Controller {
 					if($label->getId() === $id) {
 						$result[] = array_merge($event->jsonSerialize(),
 							array('hasReminder' =>
-							in_array($event, $user->getReminders()->toArray(), true)));
+								in_array($event,
+									$user->getReminders()->toArray(), true),
+								'mine' => ($event->getOwner()->getId() ==
+									$user->getId())
+						));
 						continue 3;
 					}
 				}
@@ -274,7 +303,13 @@ class EventsController extends Controller {
 		foreach($tops as $top) {
 			$result[] = UserManagementController::encodeNode($top);
 		}
+		foreach($this->getUser()->getSubscribedLabels() as $label) {
+			$result[] = UserManagementController::nodeToJsonArray($label);
+		}
 
+//		echo "<pre>";
+//		var_dump(json_encode($result));
+//		echo "</pre>";
 		return $this->render(
 			'SharifCalendarBundle:EventManagement:searchEvent.html.twig',
 			array('labels' => json_encode($result)));

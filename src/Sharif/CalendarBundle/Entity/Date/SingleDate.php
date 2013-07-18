@@ -258,7 +258,18 @@ class SingleDate extends AbstractDate {
 	 * @inheritdoc
 	 */
 	public function toString() {
-		return $this->year.'/'.$this->month.'/'.$this->day.' '.$this->type;
+		switch ($this->type) {
+			case 'Gregorian' :
+				$type = 'میلادی';
+				break;
+			case 'Lunar-Hijri' :
+				$type = 'هجری قمری';
+				break;
+			case 'Jalali' :
+				$type = 'شمسی';
+				break;
+		}
+		return $this->year.'/'.$this->month.'/'.$this->day.' '.$type;
 	}
 
 	/**

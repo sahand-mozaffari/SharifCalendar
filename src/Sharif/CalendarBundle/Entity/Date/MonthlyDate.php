@@ -41,6 +41,6 @@ class MonthlyDate extends RecurringDate {
 	 */
 	public function toString() {
 		$step = $this->step > 1 ? $this->step.' ' : '';
-		return 'Every '.$step.' month from '.$this->base->toString();
+		return 'هر '.$step.' ماه، از '.$this->base->toString();
 	}
 }

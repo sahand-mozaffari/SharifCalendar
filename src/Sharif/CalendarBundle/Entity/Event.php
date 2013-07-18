@@ -35,7 +35,8 @@ class Event implements \Serializable, \JsonSerializable {
 	protected $id;
 	/**
 	 * @var Label[] Labels associated to this event.
-	 * @ORM\ManyToMany(targetEntity="Label", mappedBy="events", cascade="all")
+	 * @ORM\ManyToMany(targetEntity="Label", mappedBy="events",
+	 *      cascade="persist")
 	 */
 	protected $labels;
 	/**
