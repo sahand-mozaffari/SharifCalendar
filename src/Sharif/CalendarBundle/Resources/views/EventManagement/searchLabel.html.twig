@@ -4,21 +4,13 @@
 	{{ parent() }}
 	<style>
 		.label {
-			border-color: orange;
-			border-radius: 5px;
-			border-style: solid;
-			border-width:  1px;
 			margin: 5px;
 			padding: 15px;
-			width: 300px;
-		}
-
-		.label:hover {
-			border-color: #ab6000;
+			width: 430px;
 		}
 
 		.label-button {
-			float: right;
+			float: left;
 		}
 
 		.label-button:hover {
@@ -36,12 +28,34 @@
 			margin-top: 5px;
 			margin-left: 20px;
 		}
+
+		#search {
+			width: 375px;
+		}
+
+		#title-box {
+			text-align: center;
+		}
+
+		#wrapper {
+			width: 473px;
+			position: relative;
+			margin-right: -236px;
+			right: 50%;
+			padding: 10px;
+		}
 	</style>
 {% endblock stylesheets %}
 
 {% block body %}
-	<input type="search" id="search" />
-	<div id="result-container"></div>
+	<div id="wrapper" class="ui-state-highlight ui-corner-all">
+		<div id="title-box">
+			<h1>جستجوی برچسب‌های عمومی</h1>
+		</div>
+		<input type="search" id="search" placeholder="کلید واژه..."/>
+		<button id="go">جستجو</button>
+		<div id="result-container"></div>
+	</div>
 {% endblock body %}
 
 {% block javascripts %}
@@ -49,6 +63,7 @@
 	<script>
 		var input = $('#search');
 		var result_box = $('#result-container');
+		var go = $('#go');
 
 		function search(e) {
 			console.log('hello');
@@ -63,7 +78,7 @@
 				}).done(function(result) {
 					var html = "";
 					for(i = 0; i < result.length; ++i) {
-						html += "<div class='label'><img class='label-button __IMG_CLASS__' src='__IMG__' uid='__ID__' /><div class='label-name' style='color: __COLOR__;'>__NAME__</div><div class='label-description'>__DESCRIPTION__</div><div class='label-owner'>By __OWNER__</div></div>".
+						html += "<div class='label ui-state-highlight ui-corner-all'><img class='label-button __IMG_CLASS__' src='__IMG__' uid='__ID__' title='اشتراک'/><div class='label-name' style='color: __COLOR__;'>__NAME__</div><div class='label-description'>__DESCRIPTION__</div><div class='label-owner'>توسط __OWNER__</div></div>".
 								replace(/__COLOR__/g, '#'+result[i]['color'].toString(16)).
 								replace(/__NAME__/g, result[i]['name']).
 								replace(/__DESCRIPTION__/g, result[i]['description']).
@@ -71,7 +86,7 @@
 								replace(/__ID__/g, result[i]['id']).
 								replace(/__IMG_CLASS__/g, result[i]['am_subscribed'] ? 'subscribed' : 'unsubscribed').
 								replace(/__IMG__/g, '{{ app.request.getSchemeAndHttpHost() }}'+
-				         '/src/Sharif/CalendarBundle/Resources/public/images/' + (result[i]['am_subscribed'] ? 'remove.png' : 'add.png'));
+				         '/src/Sharif/CalendarBundle/Resources/public/images/' + (result[i]['am_subscribed'] ? 'delete.png' : 'add.png'));
 					}
 					result_box.html(html);
 
@@ -79,7 +94,7 @@
 					$('.unsubscribed').click(subscribe);
 				}).fail(function() {
 					var notif = noty({
-						text: 'Failed to carry out your request. Please try again.',
+						text: 'جسجتوی مورد نظر با مشکل مواجه شد. لطفاً دوباره تلاش کنید.',
 						layout: 'topRight',
 						type: 'warning',
 						closeWith: ['hover']
@@ -110,10 +125,10 @@
 				target.removeClass('unsubscribed');
 				target.addClass('subscribed');
 				target.attr('src', '{{ app.request.getSchemeAndHttpHost() }}'+
-						'/src/Sharif/CalendarBundle/Resources/public/images/remove.png');
+						'/src/Sharif/CalendarBundle/Resources/public/images/delete.png');
 			}).fail(function(msg) {
 				noty({
-					text: msg == "" ? "Unknown error" : msg,
+					text: msg == "" ? "خطای نامشخص" : msg,
 					layout: 'topRight',
 					type: 'warning',
 					closeWith: ['hover']
@@ -145,7 +160,7 @@
 						'/src/Sharif/CalendarBundle/Resources/public/images/add.png');
 			}).fail(function(msg) {
 				noty({
-					text: msg == "" ? "Unknown error" : msg,
+					text: msg == "" ? "خطای نامشخص" : msg,
 					layout: 'topRight',
 					type: 'warning',
 					closeWith: ['hover']
@@ -155,13 +170,11 @@
 	</script>
 
 	<script>
-		input.change(search);
-		input.button().css({
-			'cursor' : 'text',
-			'font' : 'inherit',
-			'outline' : 'none',
-			'text-align' : 'inherit',
-			'background' : 'white'
-		}).unbind('mousedown');
+		$(document).ready(function() {
+			input.change(search);
+			input.addClass(
+					'ui-button ui-state-default ui-corner-all ui-text-button ui ');
+			go.button();
+		});
 	</script>
 {% endblock javascripts %}

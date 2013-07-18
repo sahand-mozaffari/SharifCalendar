@@ -307,9 +307,6 @@ class EventsController extends Controller {
 			$result[] = UserManagementController::nodeToJsonArray($label);
 		}
 
-//		echo "<pre>";
-//		var_dump(json_encode($result));
-//		echo "</pre>";
 		return $this->render(
 			'SharifCalendarBundle:EventManagement:searchEvent.html.twig',
 			array('labels' => json_encode($result)));
@@ -363,15 +360,15 @@ class EventsController extends Controller {
 		$label = $repository->findOneById($id);
 
 		if(in_array($label, $user->getSubscribedLabels()->toArray(), true)) {
-			return new Response('You are already subscribed.', 403);
+			return new Response('شما قبلاً مشترک این برچسب شده‌اید.', 403);
 		} elseif(in_array($label, $user->getLabels()->toArray(), true)) {
-			return new Response('You are already own the label.', 403);
+			return new Response('شما صاحب این برچسب هستید.', 403);
 		} else {
 			$user->addSubscribedLabel($label);
 			$em = $this->getDoctrine()->getManager();
 			$em->persist($user);
 			$em->flush();
-			return new Response('You subscribed to this label successfully.');
+			return new Response('شما با موفقیت مشترک این برچسب شدید..');
 		}
 	}
 
@@ -389,12 +386,12 @@ class EventsController extends Controller {
 			$em->persist($user);
 			$em->flush();
 			return new Response(
-				'You unsubscribed from this label successfully.');
+				'شما با موفقیتب اشتراک خود با این برجسب را لغو کردید.');
 		} elseif(in_array($label, $user->getLabels()->toArray(), true)) {
 			return new Response(
-				'You own the label. If you wish to dismiss this label, use the remove option in label settings page.', 403);
+				'شما صاحب این برچسب هستید. اگر می‌خواهید آن را حذف کنید از صفحه‌ی جستجوی رویدادها استفاده کنید..', 403);
 		} else {
-			return new Response('You are not subscribed to this label', 403);
+			return new Response('شما مشترک این برچسب نیستید.', 403);
 		}
 	}
 

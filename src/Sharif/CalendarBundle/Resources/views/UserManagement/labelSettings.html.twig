@@ -1,22 +1,65 @@
 {% extends "SharifCalendarBundle::baseHtml.html.twig" %}
-
 {% set labels=app.user.labels %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>
+		label {
+			display: inline-block;
+			width: 80px;
+		}
+
+		#header-box {
+			text-align: center;
+		}
+
+		#removeButton {
+			display: inline-block;
+			right: 110px;
+		}
+
+		#tree-container {
+			direction: ltr;
+		}
+
+		#wrapper {
+			margin-right: -147px;
+			padding: 10px;
+			position: relative;
+			right: 50%;
+			width: 294px;
+		}
+	</style>
+{% endblock stylesheets %}
 
 {% block body %}
 	{{ parent() }}
-	<div id="tree-container"></div>
-	<div id="details" style="display: none">
-		<input id="text" type="text" />
-		<input id="description" type="text" />
-		<div id="colorPicker"></div>
-		<input id="publicity" type="checkbox"
-				value="{{ 'public'|trans|humanize }}" />
-		<button data-role="button" id="removeButton">
-			{{ 'remove'|trans|humanize }}
-		</button>
+	<div id="wrapper" class="ui-state-highlight ui-corner-all">
+		<div id="header-box">
+			<h1>ویرایش برچسب‌ها</h1>
+		</div>
+		<div id="tree-container"></div>
+		<div id="details" style="display: none">
+			<hr/>
+			<label for="text">نام</label>
+			<input id="text" type="text" placeholder="نام"/>
+			<br/>
+			<label for="description">توضیح</label>
+			<input id="description" type="text" placeholder="توضیح"/>
+			<br/>
+			<label for="colorPicker">رنگ</label>
+			<div id="colorPicker"></div>
+			<br/>
+			<label for="publicity">عمومی باشد؟</label>
+			<input id="publicity" type="checkbox" />
+			<button data-role="button" id="removeButton">
+				حذف
+			</button>
+			<hr/>
+		</div>
+		<button data-role="button" onclick="addClick()">جدید</button>
+		<button data-role="button" onclick="submitClick()">ثبت</button>
 	</div>
-	<button data-role="button" onclick="addClick()">{{ 'add'|trans|humanize }}</button>
-	<button data-role="button" onclick="submitClick()">{{ 'submit'|trans|humanize }}</button>
 {% endblock body %}
 
 {% block javascripts %}
@@ -189,20 +232,10 @@
 
 		updateTreeView();
 		$("button").button();
-		$("#text").button().css({
-			'cursor' : 'text',
-			'font' : 'inherit',
-			'outline' : 'none',
-			'text-align' : 'inherit',
-			'background' : 'white'
-		}).unbind('mousedown');
-		$("#description").button().css({
-			'cursor' : 'text',
-			'font' : 'inherit',
-			'outline' : 'none',
-			'text-align' : 'inherit',
-			'background' : 'white'
-		}).unbind('mousedown');
+		$("#text").addClass(
+				'ui-button ui-state-default ui-corner-all ui-text-button ui ');
+		$("#description").addClass(
+				'ui-button ui-state-default ui-corner-all ui-text-button ui ');
 		$("#colorPicker").kendoColorPicker();
 
 		nodes = $("#label-tree li");

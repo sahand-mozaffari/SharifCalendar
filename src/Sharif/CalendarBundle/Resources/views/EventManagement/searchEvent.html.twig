@@ -40,6 +40,10 @@
 			display: none;
 		}
 
+		#header-box {
+			text-align: center;
+		}
+
 		#tree-container {
 			direction: ltr;
 			padding: 5px
@@ -58,6 +62,9 @@
 
 {% block body %}
 	<div id="wrapper" class="ui-state-highlight ui-corner-all">
+		<div id="header-box">
+			<h1>جستجوی رویدادها</h1>
+		</div>
 		<div id="top-box">
 			<input type="search" id="search" placeholder="جستجو...">
 			<button id="go">جستجو</button>

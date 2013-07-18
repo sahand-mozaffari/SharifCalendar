@@ -21,6 +21,14 @@
 			text-align: center;
 		}
 
+		#header-box {
+			text-align: center;
+		}
+
+		#openid_identifier {
+			direction: ltr;
+		}
+
 		#wrapper {
 			right: -162px;
 			margin-right: 50%;
@@ -33,6 +41,9 @@
 
 {% block body %}
 	<div id="wrapper" class="ui-state-highlight ui-corner-all">
+		<div id="header-box">
+			<h1>ثبت نام</h1>
+		</div>
 		<form method="post" {{ form_enctype(formUserPass) }}>
 			{{ form_rest(formUserPass) }}
 			<input type='hidden' name='form' value='userPass' />
@@ -52,8 +63,7 @@
 
 			<label for="openid_identifier">شناسه</label>
 			<input type="text" id="openid_identifier"
-					name="openid_identifier"
-					value="" />
+					name="openid_identifier" value="" placeholder="Open ID"/>
 			<br />
 			<input type="submit" id="_submit" name="_submit" value="ثبت‌نام" />
 			<input type="hidden"

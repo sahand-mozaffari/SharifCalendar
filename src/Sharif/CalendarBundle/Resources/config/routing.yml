@@ -61,7 +61,7 @@ sharif_calendar_login:
     defaults:
         _controller:    SharifCalendarBundle:UserManagement:login
 
-# Authendticates users.
+# Authenticates users.
 sharif_calendar_login_check:
     pattern:    /secured_area/login_check
 

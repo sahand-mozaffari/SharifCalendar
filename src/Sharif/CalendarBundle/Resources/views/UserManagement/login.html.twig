@@ -26,6 +26,10 @@
 			text-align: center;
 		}
 
+		#header-box {
+			text-align: center;
+		}
+
 		#openid_identifier {
 			direction: ltr;
 		}
@@ -42,6 +46,12 @@
 
 {% block body %}
 	<div id="wrapper" class="ui-state-highlight ui-corner-all">
+		<div id="header-box">
+			<h1>
+				ورود
+			</h1>
+		</div>
+
 		{# errors #}
 		<div>
 			{% if error %}
@@ -55,7 +65,8 @@
 				<label for="username" class="label-for-text">
 					نام کاربری
 				</label>
-				<input type="text" id="username" name="_user"" />
+				<input type="text" id="username" name="_user"
+						placeholder="نام کاربری"/>
 				<br />
 				<label for="password" class="label-for-text">
 					رمز عبور
@@ -85,8 +96,8 @@
 					شناسه
 				</label>
 				<input type="text" id="openid_identifier"
-						name="openid_identifier"
-						value="" />
+						name="openid_identifier" value=""
+						placeholder="Open ID"/>
 				<br />
 				<label for="remember_me">مرا به خاطر بسپار</label>
 				<input type="checkbox"
