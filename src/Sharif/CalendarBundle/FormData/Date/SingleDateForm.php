@@ -10,9 +10,9 @@ class SingleDateForm extends AbstractType{
 	 * @inheritdoc
 	 */
 	public function buildForm(FormBuilderInterface $builder, array $options) {
-		$builder->add('year', 'integer', array('label' => 'year'));
-		$builder->add('month', 'integer', array('label' => 'month'));
-		$builder->add('day', 'integer', array('label' => 'day'));
+		$builder->add('year', 'integer', array('label' => 'سال'));
+		$builder->add('month', 'integer', array('label' => 'ماه'));
+		$builder->add('day', 'integer', array('label' => 'روز'));
 		$builder->add('type', 'date_type');
 	}
 

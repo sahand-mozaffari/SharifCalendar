@@ -12,14 +12,14 @@ class EventForm  extends AbstractType {
 	 */
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$opts = array('required' => true, 'max_length' => 200,
-			'label' => 'title', 'trim' => true);
+			'label' => 'عنوان', 'trim' => true);
 		if(isset($options['data'])) {
 			$opts = array_merge($opts,
 				array('data' => $options['data']->getTitle()));
 		}
 		$builder->add('title', 'text', $opts);
 
-		$opts = array('max_length' => 2000, 'label' => 'description',
+		$opts = array('max_length' => 2000, 'label' => 'توضیحات',
 			'trim' => true);
 		if(isset($options['data'])) {
 			$opts = array_merge($opts,
@@ -34,7 +34,7 @@ class EventForm  extends AbstractType {
 			}
 		}
 		$builder->add($builder->create('labels', 'hidden',
-			array('data' => json_encode($arr)))->
+			array('label' => 'برچسب‌ها', 'data' => json_encode($arr)))->
 			addModelTransformer(new LabelsTransformer()));
 
 		$builder->add('date', 'date_form');

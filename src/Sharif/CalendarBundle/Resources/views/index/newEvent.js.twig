@@ -9,9 +9,9 @@
 		var date_date_class = $("#event_date_date_class");
 		var single_date_container = $('#single-date-container');
 		var recurring_date_container = $('#recurring-date-container');
-		var start_date_dateValue = $('#event_date_start_date_dateValue');
+		var start_date_dateValue = $('#event_date_start_date_dateValue').parent();
 		var start_date_hasValue = $('#event_date_start_date_hasValue');
-		var end_date_dateValue = $('#event_date_end_date_dateValue');
+		var end_date_dateValue = $('#event_date_end_date_dateValue').parent();
 		var end_date_hasValue = $('#event_date_end_date_hasValue');
 		var event_timeRange_hasValue = $('#event_timeRange_hasValue');
 		var event_timeRange_time_range = $('#time-range-container');
@@ -64,13 +64,8 @@
 			upArrowText: "Up"
 		});
 		$('input[type=submit]').button();
-		$("#event_title").button().css({
-			'cursor' : 'text',
-			'font' : 'inherit',
-			'outline' : 'none',
-			'text-align' : 'inherit',
-			'background' : 'white'
-		}).unbind('mousedown');
+		$("#event_title").addClass(
+				'ui-button ui-state-default ui-corner-all ui-text-button ui ');
 		$('#labels_select').kendoMultiSelect({
 			dataSource: {{ data|raw }},
 			dataTextField: 'name',

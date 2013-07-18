@@ -8,9 +8,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 class NullableSingleDateForm extends AbstractType
 	implements DataTransformerInterface {
 	private $hasValueLabel;
+	private $valueLabel;
 
-	function __construct($hasValueLabel='hasValue') {
+	function __construct($hasValueLabel='hasValue', $valueLabel='value') {
 		$this->hasValueLabel = $hasValueLabel;
+		$this->valueLabel = $valueLabel;
 	}
 
 	/**
@@ -20,7 +22,7 @@ class NullableSingleDateForm extends AbstractType
 		$builder->
 			add('hasValue', 'checkbox', array('required' => false,
 				'label' => $this->hasValueLabel))->
-			add('dateValue', 'single_date', array('label' => ' '))->
+			add('dateValue', 'single_date', array('label' => $this->valueLabel))->
 			addModelTransformer($this);
 	}
 

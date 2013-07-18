@@ -10,9 +10,9 @@ class TimeRangeForm extends AbstractType {
 	 */
 	public function buildForm(FormBuilderInterface $builder, array $options) {
 		$builder->add('startTime', 'time', array('widget' => 'single_text',
-			'input' => 'datetime', 'label' => 'start_time'));
+			'input' => 'datetime', 'label' => 'ساعت شروع'));
 		$builder->add('endTime', 'time', array('widget' => 'single_text',
-			'input' => 'datetime', 'label' => 'end_time'));
+			'input' => 'datetime', 'label' => 'ساعت پایان'));
 	}
 
 	/**

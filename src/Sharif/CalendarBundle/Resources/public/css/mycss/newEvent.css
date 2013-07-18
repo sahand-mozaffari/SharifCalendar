@@ -1,6 +1,26 @@
-label {
+#dialog label {
+	line-height: 40px;
 	display: inline-block;
-	width: 100px;
+	width: 135px;
+}
+
+#dialog label[for=event_title] {
+	width: 75px;
+}
+
+#date-time-wrapper label {
+	display: inline-block;
+	font-size: xx-large;
+	color: #ffb500;
+	padding: 10px;
+	width: auto;
+}
+
+#date-time-wrapper label[for] {
+	font-size: inherit;
+	color: inherit;
+	padding: inherit;
+	width: 130px;
 }
 
 .k-editor {
@@ -20,22 +40,11 @@ label {
 	display: inline-block;
 }
 
-#date-time-wrapper label {
-	display: inline-block;
-	font-size: xx-large;
-	color: #ffb500;
-	padding: 10px;
-	width: auto;
-}
-
-#date-time-wrapper label[for] {
-	font-size: inherit;
-	color: inherit;
-	padding: inherit;
-	width: 100px;
+#dialog {
+	font-size: medium;
 }
 
 #event_title {
-	width:  600px;
+	width:  495px;
 	margin-left: 5px;
 }

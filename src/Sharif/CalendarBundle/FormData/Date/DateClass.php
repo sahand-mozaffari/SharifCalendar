@@ -6,7 +6,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class DateClass extends AbstractType {
 	protected $label;
 
-	function __construct($label='class') {
+	function __construct($label='نوع تاریخ') {
 		$this->label = $label;
 	}
 
@@ -28,25 +28,11 @@ class DateClass extends AbstractType {
 	 * @inheritdoc
 	 */
 	public function setDefaultOptions(OptionsResolverInterface $resolver) {
-		global $kernel;
-		if ('AppCache' == get_class($kernel)) {
-			$kernel = $kernel->getKernel();
-		}
-		$translator = $kernel->getContainer()->get('translator');
-
 		$resolver->setDefaults(array(
 			'choices' =>
-				array(
-					'single' =>
-						$translator->trans('single', array(), 'dateClass'),
-					'annual' =>
-						$translator->trans('annual', array(), 'dateClass'),
-					'monthly' =>
-						$translator->trans('monthly', array(), 'dateClass'),
-					'weekly' =>
-						$translator->trans('weekly', array(), 'dateClass'),
-					'daily' =>
-						$translator->trans('daily', array(), 'dateClass'),
+				array('single' => 'تک', 'annual' => 'سالانه',
+					'monthly' => 'ماهانه', 'weekly' => 'هفتگی',
+					'daily' => 'روزانه',
 				), 'label' => $this->label
 		));
 	}

@@ -9,7 +9,7 @@ class NullableTimeRangeForm extends AbstractType
         implements DataTransformerInterface {
 	private $hasValueLabel;
 
-	function __construct($hasValueLabel='has_time') {
+	function __construct($hasValueLabel='ساعت مشخصی دارد؟') {
 		$this->hasValueLabel = $hasValueLabel;
 	}
 
@@ -20,7 +20,7 @@ class NullableTimeRangeForm extends AbstractType
 		$builder->add('hasValue', 'checkbox',
 			array('label' => $this->hasValueLabel, 'required' => false));
 		$builder->add('time_range', 'time_range',
-			array('label' => 'time_range', 'required' => false));
+			array('label' => 'بازه‌ی زمانی', 'required' => false));
 		$builder->addModelTransformer($this);
 	}
 

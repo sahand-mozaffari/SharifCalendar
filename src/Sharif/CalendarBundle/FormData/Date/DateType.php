@@ -22,22 +22,11 @@ class DateType extends AbstractType {
 	 * @inheritdoc
 	 */
 	public function setDefaultOptions(OptionsResolverInterface $resolver) {
-		global $kernel;
-		if ('AppCache' == get_class($kernel)) {
-			$kernel = $kernel->getKernel();
-		}
-		$translator = $kernel->getContainer()->get('translator');
-
 		$resolver->setDefaults(array(
 			'choices' =>
-				array(
-					'Gregorian' =>
-						$translator->trans('gregorian', array(), 'submitFrom'),
-					'Jalali' =>
-						$translator->trans('jalali', array(), 'submitFrom'),
-					'Lunar-Hijri' =>
-						$translator->trans('lunar_hijri', array(), 'submitFrom')
-				), 'label' => 'type'
+				array('Gregorian' => 'میلادی', 'Jalali' => 'جلالی',
+					'Lunar-Hijri' => 'هجری قمری'
+				), 'label' => 'نوع تقویم'
 		));
 	}
 }

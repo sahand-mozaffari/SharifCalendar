@@ -36,6 +36,10 @@
 			width: 525px;
 		}
 
+		#edit-submit {
+			display: none;
+		}
+
 		#tree-container {
 			direction: ltr;
 			padding: 5px
@@ -49,6 +53,7 @@
 			width: 620px;
 		}
 	</style>
+	<link rel="stylesheet" href="http://localhost/src/Sharif/CalendarBundle/Resources/public/css/mycss/newEvent.css" />
 {% endblock stylesheets %}
 
 {% block body %}
@@ -238,7 +243,32 @@
 				console.log(msg);
 				var dialog = $('#dialog');
 				dialog.html(msg);
-				dialog.dialog();
+				dialog.dialog({
+					width:  645,
+					buttons: [
+						{
+							text: "بستن",
+							click: function() {
+								$('#submit').click();
+								$( this ).dialog( "close" );
+							}
+						},
+						{
+							text: "تایید",
+							click: function() {
+								$( this ).dialog( "close" );
+							}
+						}
+					],
+					closeOnEscape:  false,
+					closeText: 'بستن',
+					height: 'auto',
+					hide:   'fold',
+					modal:  true,
+					resizable:  false,
+					show:   'fold',
+					title:  'ویرایش رویداد'
+				});
 			}).fail(function(msg) {
 				noty({
 					text: 'بارگیری اطلاعات مورد نظر با مشکل مواجه شد. لطفاً دوباره تلاش کنید.',

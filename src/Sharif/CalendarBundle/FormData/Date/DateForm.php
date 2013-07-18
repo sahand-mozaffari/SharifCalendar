@@ -18,9 +18,11 @@ class DateForm extends AbstractType implements DataTransformerInterface {
 	protected $stepLabel;
 	protected $dateTypeLabel;
 
-	function __construct($hasStartLabel='has_start', $hasEndLabel='has_end',
-	                     $dateTypeLabel='date_type', $baseDateLabel='base_date',
-	                     $singleDateLabel='single_date', $stepLabel='step') {
+	function __construct($hasStartLabel='تاریخ آغاز دارد؟',
+	                     $hasEndLabel='تاریخ پایان دارد؟',
+	                     $dateTypeLabel='نوع تقویم',
+	                     $baseDateLabel='تاریخ پایه',
+	                     $singleDateLabel='تاریخ تک', $stepLabel='گام') {
 		$this->baseDateLabel = $baseDateLabel;
 		$this->hasEndLabel = $hasEndLabel;
 		$this->hasStartLabel = $hasStartLabel;
@@ -41,8 +43,10 @@ class DateForm extends AbstractType implements DataTransformerInterface {
 				array('label' => $this->baseDateLabel))->
 			add('step', 'integer', array('label' => $this->stepLabel,
 				'required' => true, 'invalid_message' => 'invalid_number'))->
-			add('start_date', new NullableSingleDateForm($this->hasStartLabel))->
-			add('end_date', new NullableSingleDateForm($this->hasEndLabel))->
+			add('start_date', new NullableSingleDateForm($this->hasStartLabel,
+				'تاریخ شروع'), array('label' => ' '))->
+			add('end_date', new NullableSingleDateForm($this->hasEndLabel,
+				'تاریخ پایان'), array('label' => ' '))->
 			addModelTransformer($this);
 	}
 
