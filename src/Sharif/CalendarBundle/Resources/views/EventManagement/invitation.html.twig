@@ -3,16 +3,34 @@
 {% block stylesheets %}
 	{{ parent() }}
 	<style>
-		.my-selectized-input {
+		div.my-selectized-input {
+			direction: ltr;
+			width: 400px;
+		}
+
+		#tree-container {
+			direction: ltr;
+			padding: 5px;
+		}
+
+		#wrapper {
+			margin-right: 50%;
+			padding: 10px;
+			position: relative;
+			right: -200px;
 			width: 400px;
 		}
 	</style>
 {% endblock stylesheets %}
 
 {% block body %}
-	<input type="text" id="email-input" placeholder="Pick some people..." class="my-selectized-input">
-	<div id="tree-container"><div id="tree-view"></div></div>
-	<button id="invite">Invite</button>
+	<div id="wrapper" class="ui-state-highlight ui-corner-all">
+		<input type="text" id="email-input"
+				placeholder="آدرس رایانامه‌ را وارد کنید"
+				class="my-selectized-input">
+		<div id="tree-container"><div id="tree-view"></div></div>
+		<button id="invite">دعوت</button>
+	</div>
 {% endblock body %}
 
 {% block javascripts %}
@@ -138,7 +156,7 @@
 			if(getSelectedLabel() == null) {
 				console.log('nothing selected');
 				noty({
-					text: 'Select a label for your friends to be invited to.',
+					text: 'یکی از برچسب‌ها را انتخاب کنید.',
 					layout: 'topRight',
 					type: 'warning',
 					closeWith: ['hover'],
@@ -149,7 +167,7 @@
 			if(emailInput.getValue() == "") {
 				console.log('no emails...');
 				noty({
-					text: 'Enter one or few email addresses to be invited.',
+					text: 'یک یا چند آدرس رایانامه را برای ارسال دعوت نامه وارد کنید.',
 					layout: 'topRight',
 					type: 'warning',
 					closeWith: ['hover'],
@@ -159,10 +177,10 @@
 			}
 			console.log('for real!');
 			var sending = noty({
-				text: 'Sending invitations...',
+				text: 'در حال ارسال دعوت‌نامه‌ها',
 				layout: 'topRight',
 				type: 'information',
-				closeWith: []
+				closeWith: ['hover']
 			});
 			console.log('here comes the ajax');
 			$.ajax({
@@ -171,13 +189,13 @@
 					id: getSelectedLabel()['id'],
 					emails: emailInput.getValue()
 				}),
-				method: "POST"
+				type: "POST"
 			}).done(function(msg) {
 				console.log('DONE');
 				console.log(msg);
 				sending.close();
 				noty({
-					text: 'Invitations were sent successfully',
+					text: 'ارسال دعوت‌نامه‌ها با موفقیت انجام شد.',
 					layout: 'topRight',
 					type: 'success',
 					closeWith: ['hover']
@@ -187,17 +205,17 @@
 				console.log(msg);
 				sending.close();
 				noty({
-					text: 'Sending invitations failed. Please check your connection and try again.',
+					text: 'ارسال دعوت‌نامه‌ها با مشکل مواجه شد. لطفاً دوباره ارسال نمایید.',
 					layout: 'topRight',
 					type: 'error',
 					closeWith: ['button'],
 					buttons: [ {
-						addClass: 'btn btn-primary', text: 'Retry', onClick: function($noty) {
+						addClass: 'btn btn-primary', text: 'ارسال دوباره', onClick: function($noty) {
 							$noty.close();
 							sendInvitation();
 						}
 					}, {
-						addClass: 'btn btn-danger', text: 'Dismiss', onClick: function($noty) {
+						addClass: 'btn btn-danger', text: 'لغو', onClick: function($noty) {
 							$noty.close();
 						}
 					}]
