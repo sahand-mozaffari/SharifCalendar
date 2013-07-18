@@ -42,6 +42,7 @@
 	<input type="search" id="search">
 	<div id="tree-container"><div id="tree-view"></div></div>
 	<div id="result-container"></div>
+	<div id="dialog"></div>
 {% endblock body %}
 
 {% block javascripts %}
@@ -85,7 +86,7 @@
 			$.ajax({
 				url:    '{{ path('sharif_calendar_add_reminder') }}',
 				data:   id.toString(),
-				method: 'POST'
+				type: 'post'
 			}).done(function(msg) {
 				var img = $('#img-'+id);
 				img.unbind('click');
@@ -106,6 +107,12 @@
 		function bindClickAdd(id) {
 			$('#img-'+id).click(function() {
 				addReminder(id);
+			});
+		}
+
+		function bindClickEdit(id) {
+			$('#img2-'+id).click(function() {
+				editEvent(id);
 			});
 		}
 
@@ -149,18 +156,48 @@
 			return canvas.toDataURL("image/png");
 		}
 
+		function editEvent(id) {
+			$.ajax({
+				type:   'POST',
+				data:   id.toString(),
+				url:    '{{ path('sharif_calendar_edit_event_form') }}'
+			}).done(function(msg) {
+				console.log(msg);
+				var dialog = $('#dialog');
+				dialog.html(msg);
+				dialog.dialog();
+			}).fail(function(msg) {
+				noty({
+					text: 'Failed to load your settings. Try again?',
+					layout: 'topRight',
+					type: 'error',
+					closeWith: ['button'],
+					buttons: [ {
+						addClass: 'btn btn-primary', text: 'Retry', onClick: function($noty) {
+							$noty.close();
+							editEvent(id);
+						}
+					}, {
+						addClass: 'btn btn-danger', text: 'Dismiss', onClick: function($noty) {
+							$noty.close();
+						}
+					}]
+				});
+			});
+		}
+
 		function reload() {
 			console.log(JSON.stringify({
 				term:           $('#search').val(),
 				checkedLabels:  checkedNodes(localDataSource._data)
 			}));
 			$.ajax({
+				url:    "{{ path('sharif_calendar_enlist_events') }}",
 				data:   JSON.stringify({
 					term:           $('#search').val(),
 					checkedLabels:  checkedNodes(localDataSource._data)
 				}),
-				method: "POST",
-				url:    "{{ path('sharif_calendar_enlist_events') }}"
+				type: "post"
 			}).done(function(msg) {
 				console.log(msg);
 				var result_container = $('#result-container');
@@ -171,6 +208,7 @@
 						("<div class='event-box' id='event-__ID__' eventId='__ID__'>" +
 						"   <div class='event-controls'>" +
 						"       <img class='reminder-button control-button' id='img-__ID__' src='{{ app.request.getSchemeAndHttpHost()}}{{ '/src/Sharif/CalendarBundle/Resources/public/images/__REMIND__' }}' />" +
+						"       <img class='edit-button control-button' id='img2-__ID__' src='{{ app.request.getSchemeAndHttpHost()}}{{ '/src/Sharif/CalendarBundle/Resources/public/images/edit.png' }}' />" +
 						"   </div>" +
 						"   <div class='event-title'>" +
 						"       <h4>__TITLE__</h4>" +
@@ -212,6 +250,7 @@
 						} else {
 							bindClickAdd(msg[i]['id']);
 						}
+						bindClickEdit(msg[i]['id']);
 					}
 					result_container.slideDown();
 				});
@@ -239,7 +278,7 @@
 			$.ajax({
 				url:    '{{ path('sharif_calendar_remove_reminder') }}',
 				data:   id.toString(),
-				method: 'POST'
+				type: 'post'
 			}).done(function() {
 				var img = $('#img-'+id);
 				img.unbind('click');

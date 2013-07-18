@@ -363,5 +363,5 @@
 	    document.body.style.width = (window.screen.width - 50) + 'px';
 	    document.body.style.height = (window.screen.height - 150) + 'px';
 	</script>
-	{% include 'SharifCalendarBundle:index:newEvent.js.twig' %}
+	{% include 'SharifCalendarBundle:index:newEvent.js.twig' with {'submitPath' : path('sharif_calendar_new_event') } %}
 {% endblock javascripts %}

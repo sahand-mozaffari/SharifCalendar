@@ -1,3 +1,4 @@
+# This link is sent via email to invite people to subscribe to a label.
 sharif_calendar_accept_invitation:
     pattern:    /user/subscribe_label/{id}
     defaults:
@@ -5,44 +6,66 @@ sharif_calendar_accept_invitation:
     requirements:
         id: \d+
 
+# Adds an event to the list of reminders of current user. Event's ID is sent via
+# POST.
 sharif_calendar_add_reminder:
     pattern:    /user/add_reminder
+    methods:    [POST]
     defaults:
         _controller:    SharifCalendarBundle:Events:addReminder
 
+# Home page
 sharif_calendar_calendar:
     pattern:    /
     defaults:
         _controller:    SharifCalendarBundle:UserManagement:index
 
+# Edits an event. Event's ID is already stored in session.
 sharif_calendar_edit_event:
-    pattern:    /user/edit-event/{id}
+    pattern:    /user/edit-event
     defaults:
         _controller:    SharifCalendarBundle:Events:editEvent
 
+# Generates the form to edit an event. Event's ID should be sent via POST. This
+# ID will be stored in session for later use.
+sharif_calendar_edit_event_form:
+    pattern:    /user/edit-event-form
+    methods:    [POST]
+    defaults:
+        _controller:    SharifCalendarBundle:Events:editEventForm
+
+# Returns the search result for events. The search data should be provided by
+# POST.
 sharif_calendar_enlist_events:
     pattern:    /user/enlist_event
+    methods:    [POST]
     defaults:
         _controller:    SharifCalendarBundle:Events:enlistEvents
 
+# Renders the page for sending invitations.
 sharif_calendar_invitation_list:
     pattern:    /user/invite
     defaults:
         _controller:    SharifCalendarBundle:Events:invitationList
 
+# Renders the page for login
 sharif_calendar_login:
     pattern:    /login
     defaults:
         _controller:    SharifCalendarBundle:UserManagement:login
 
+# Authendticates users.
 sharif_calendar_login_check:
     pattern:    /secured_area/login_check
 
+# Submission target for the new event's form.
 sharif_calendar_new_event:
     pattern:    /user/new_event
+    methods:    [POST]
     defaults:
         _controller:    SharifCalendarBundle:Events:new
 
+# Returns current user's list of events in a specific range of time.
 sharif_calendar_query_event:
     pattern:    /user/query/event/{fromYear}/{fromMonth}/{fromDay}/{toYear}/{toMonth}/{toDay}
     defaults:
@@ -55,63 +78,85 @@ sharif_calendar_query_event:
         to-month:   \d+
         to-day:     \d+
 
+# Searches for public labels. Search data should be delivered via POST.
 sharif_calendar_query_label:
     pattern:    /user/query/label
+    methods:    [POST]
     defaults:
         _controller:    SharifCalendarBundle:Events:getLabels
 
+# Removes a reminder for current user. Reminder ID should be sent via POST.
 sharif_calendar_remove_reminder:
     pattern:    /user/remove_reminder
+    methods:    [POST]
     defaults:
         _controller:    SharifCalendarBundle:Events:removeReminder
 
+# Renders the page for searching current user's events.
 sharif_calendar_search_events:
     pattern:    /user/search_event
     defaults:
         _controller:    SharifCalendarBundle:Events:searchEvents
 
+# Renders the page for searching for public labels.
 sharif_calendar_search_labels:
     pattern:    /user/search_label
     defaults:
         _controller:    FrameworkBundle:Template:template
         template:   'SharifCalendarBundle:EventManagement:searchLabel.html.twig'
 
+# Sends an invitations for a label to a list of emails. The label ID and the
+# list of emails should be provided via POST.
 sharif_calendar_send_invitations:
     pattern:    /user/send_invitation
+    methods:    [POST]
     defaults:
         _controller:    SharifCalendarBundle:Events:sendInvitations
 
+# Renders the page for customizing the labels.
 sharif_calendar_setting_labels:
     pattern:    /user/setting/labels
     defaults:
         _controller:    SharifCalendarBundle:UserManagement:settingLabels
 
+# Renders the page for signing up a new user.
 sharif_calendar_signup:
     pattern:    /signup
     defaults:
         _controller:    SharifCalendarBundle:UserManagement:signup
 
+# Renders the page to which the user will be redirected after a successful
+# sign up.
 sharif_calendar_signup_successful:
     pattern:    /signup_successful
     defaults:
         _controller:    FrameworkBundle:Template:template
         template:   'SharifCalendarBundle:UserManagement:signupSuccessful.html.twig'
 
+# Subscribes current user to a label. Label ID should be transferred via POST.
 sharif_calendar_subscribe_labels:
     pattern:    /user/subscribe_label
+    methods:    [POST]
     defaults:
         _controller:    SharifCalendarBundle:Events:subscribeLabel
 
+# Submission target for label customization page.
 sharif_calendar_submit_labels:
     pattern:    /user/submit/labels
+    methods:    [POST]
     defaults:
         _controller:    SharifCalendarBundle:UserManagement:submitLabels
 
+# Unsubscribes current user from a label. Label ID should be included in
+# POST data.
 sharif_calendar_unsubscribe_labels:
     pattern:    /user/unsubscribe_label
+    methods:    [POST]
     defaults:
         _controller:    SharifCalendarBundle:Events:unsubscribeLabel
 
+# Cron utility that sends reminders to users via email, about their events on
+# next day.
 sharif_calendar_mailer:
     pattern:    /mail
     host: "localhost"

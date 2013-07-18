@@ -134,12 +134,12 @@
 	function postForm() {
 		$.ajax({
 			data:   $('#event_form').serialize(),
-			url:    '{{ path('sharif_calendar_new_event') }}',
-			method: 'POST'
+			url:    '{{ submitPath }}',
+			type: 'POST'
 		}).done(function (msg) {
 			console.log(msg);
 			noty({
-				text: 'Event created successfully.',
+				text: 'Operation handled successfully.',
 				layout: 'topRight',
 				type: 'success',
 				timeout:    5000,
@@ -147,7 +147,6 @@
 			});
 			// Close the dialog window maybe.
 		}).fail(function (msg) {
-			console.log(msg);
 			// msg contains the form errors. could be used to hint user.
 			noty({
 				text: 'Failed to create new event. Try again?',
